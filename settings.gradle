@@ -1,0 +1,2 @@
+include ':chemlabfuel'
+rootProject.name = "ChemLabFuel"
