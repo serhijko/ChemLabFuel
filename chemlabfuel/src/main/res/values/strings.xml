@@ -1,3 +1,10 @@
 <resources>
-    <string name="app_name">ChemLabFuel</string>
+    <string name="app_name">Химлаборатория «Топливо»</string>
+    <string name="app_main">Журнал учета оборудования (СИ и ИО)</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Пароль</string>
+    <string name="action_sign_in">Войти</string>
+    <string name="exit">Выйти</string>
+    <string name="open_menu">Открыть меню</string>
+    <string name="edit">Редактировать</string>
 </resources>
