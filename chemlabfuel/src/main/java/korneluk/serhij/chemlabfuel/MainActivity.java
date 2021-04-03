@@ -48,6 +48,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -63,13 +64,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private ListView listView;
     private ProgressBar progressBar;
     private final ArrayList<String> inventarny_spisok = new ArrayList<>();
-    private final ArrayList<HashMap> inventarny_spisok_data = new ArrayList<>();
+    //private final ArrayList<ArrayMap<String, String>> inventarny_spisok_data = new ArrayList<>();
     private ArrayAdapter<String> arrayAdapter;
     private final ArrayList<ArrayList<String>> users = new ArrayList<>();
-    private final ArrayList<ArrayList<Long>> notifications = new ArrayList<>();
     private TextView textView;
     private Dialog_description_edit descriptionEdit;
     private String userEdit;
+    public static InventoryList[] InventoryList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -150,13 +151,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         String zero1 = "";
         String zero2 = "";
         String editedString = "";
-        if (inventarny_spisok_data.get(position).get("editedAt") != null && inventarny_spisok_data.get(position).get("editedBy") != null) {
-            long edited;
-            if (inventarny_spisok_data.get(position).get("editedAt") instanceof Double)
-                edited = (long) (double) inventarny_spisok_data.get(position).get("editedAt");
-            else
-                edited = (long) inventarny_spisok_data.get(position).get("editedAt");
-            String editedBy = (String) inventarny_spisok_data.get(position).get("editedBy");
+        if (InventoryList[position].editedBy.equals("")) {
+            long edited = InventoryList[position].editedAt;
+            String editedBy = InventoryList[position].editedBy;
             for (int i = 0; i < users.size(); i++) {
                 if (users.get(i).get(0).contains(editedBy)) {
                     fn = users.get(i).get(1);
@@ -170,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             if (c.get(Calendar.MONTH) < 9) zero2 = "0";
             editedString = " Изменено " + zero1 + c.get(Calendar.DATE) + "." + zero2 + (c.get(Calendar.MONTH) + 1) + "." + c.get(Calendar.YEAR) + " " + fn + " " + ln;
         }
-        String createdBy = (String) inventarny_spisok_data.get(position).get("createdBy");
+        String createdBy = InventoryList[position].createdBy;
         for (int i = 0; i < users.size(); i++) {
             if (users.get(i).get(0).contains(createdBy)) {
                 fnG = users.get(i).get(1);
@@ -178,44 +175,60 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 break;
             }
         }
-        String data02 = (String) inventarny_spisok_data.get(position).get("data02");
-        String builder = "<strong>Марка, тип</strong><br>" + inventarny_spisok_data.get(position).get("data03") + "<br><br>" +
-                "<strong>Заводской номер (инв. номер)</strong><br>" + inventarny_spisok_data.get(position).get("data04") + "<br><br>" +
-                "<strong>Год выпуска (ввода в эксплуатацию)</strong><br>" + inventarny_spisok_data.get(position).get("data05") + "<br><br>" +
-                "<strong>Периодичность метролог. аттестации, поверки, калибровки, мес.</strong><br>" + inventarny_spisok_data.get(position).get("data06") + "<br><br>" +
-                "<strong>Дата последней аттестации, поверки, калибровки</strong><br>" + inventarny_spisok_data.get(position).get("data07") + "<br><br>" +
-                "<strong>Дата следующей аттестации, поверки, калибровки</strong><br>" + inventarny_spisok_data.get(position).get("data08") + "<br><br>" +
-                "<strong>Дата консервации</strong><br>" + inventarny_spisok_data.get(position).get("data09") + "<br><br>" +
-                "<strong>Дата расконсервации</strong><br>" + inventarny_spisok_data.get(position).get("data10") + "<br><br>" +
+        String data02 = InventoryList[position].data02;
+        String builder = "<strong>Марка, тип</strong><br>" + InventoryList[position].data03 + "<br><br>" +
+                "<strong>Заводской номер (инв. номер)</strong><br>" + InventoryList[position].data04 + "<br><br>" +
+                "<strong>Год выпуска (ввода в эксплуатацию)</strong><br>" + InventoryList[position].data05 + "<br><br>" +
+                "<strong>Периодичность метролог. аттестации, поверки, калибровки, мес.</strong><br>" + InventoryList[position].data06 + "<br><br>" +
+                "<strong>Дата последней аттестации, поверки, калибровки</strong><br>" + InventoryList[position].data07 + "<br><br>" +
+                "<strong>Дата следующей аттестации, поверки, калибровки</strong><br>" + InventoryList[position].data08 + "<br><br>" +
+                "<strong>Дата консервации</strong><br>" + InventoryList[position].data09 + "<br><br>" +
+                "<strong>Дата расконсервации</strong><br>" + InventoryList[position].data10 + "<br><br>" +
                 "<strong>Ответственный</strong><br>" + fnG + " " + lnG + "<br><br>" +
-                "<strong>Примечания</strong><br>" + inventarny_spisok_data.get(position).get("data12") + editedString;
+                "<strong>Примечания</strong><br>" + InventoryList[position].data12 + editedString;
         Dialog_description description = Dialog_description.getInstance(data02, builder);
         description.show(getSupportFragmentManager(), "description");
     }
 
     @Override
     public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
-        Dialog_context_menu menu = Dialog_context_menu.getInstance(position, (String) inventarny_spisok_data.get(position).get("data02"));
+        Dialog_context_menu menu = Dialog_context_menu.getInstance(position, InventoryList[position].data02);
         menu.show(getSupportFragmentManager(), "menu");
         return true;
     }
 
     @Override
     public void onDialogEditPosition(int position) {
-        descriptionEdit = Dialog_description_edit.getInstance(userEdit, (String) inventarny_spisok_data.get(position).get("uid"), (String) inventarny_spisok_data.get(position).get("data02"), (String) inventarny_spisok_data.get(position).get("data03"), (String) inventarny_spisok_data.get(position).get("data04"), (String) inventarny_spisok_data.get(position).get("data05"), (String) inventarny_spisok_data.get(position).get("data06"), (String) inventarny_spisok_data.get(position).get("data07"), (String) inventarny_spisok_data.get(position).get("data08"), (String) inventarny_spisok_data.get(position).get("data09"), (String) inventarny_spisok_data.get(position).get("data10"), (String) inventarny_spisok_data.get(position).get("data12"));
-        descriptionEdit.show(getSupportFragmentManager(), "edit");
+        if (isNetworkAvailable()) {
+            descriptionEdit = Dialog_description_edit.getInstance(userEdit, InventoryList[position].uid,
+                    InventoryList[position].data02, InventoryList[position].data03,
+                    InventoryList[position].data04, InventoryList[position].data05,
+                    InventoryList[position].data06, InventoryList[position].data07,
+                    InventoryList[position].data08, InventoryList[position].data09,
+                    InventoryList[position].data10, InventoryList[position].data12);
+            descriptionEdit.show(getSupportFragmentManager(), "edit");
+        } else {
+            Dialog_no_internet noInternet = new Dialog_no_internet();
+            noInternet.show(getSupportFragmentManager(), "internet");
+        }
     }
 
     @Override
     public void onDialogDeleteClick(int position) {
-        Dialog_delete_confirm confirm = Dialog_delete_confirm.getInstance((String) inventarny_spisok_data.get(position).get("data02"), position);
-        confirm.show(getSupportFragmentManager(), "confirm");
+        if (isNetworkAvailable()) {
+            Dialog_delete_confirm confirm = Dialog_delete_confirm.getInstance(
+                    InventoryList[position].data02, position);
+            confirm.show(getSupportFragmentManager(), "confirm");
+        } else {
+            Dialog_no_internet noInternet = new Dialog_no_internet();
+            noInternet.show(getSupportFragmentManager(), "internet");
+        }
     }
 
     @Override
     public void delete_data(int position) {
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-        mDatabase.child("equipments").child((String) inventarny_spisok_data.get(position).get("uid")).removeValue();
+        mDatabase.child("equipments").child(InventoryList[position].uid).removeValue();
     }
 
     @Override
@@ -235,10 +248,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser == null)
-            menu.findItem(R.id.exit).setVisible(false);
-        else
-            menu.findItem(R.id.exit).setVisible(true);
+        menu.findItem(R.id.exit).setVisible(currentUser != null);
+        SharedPreferences fuel = getSharedPreferences("fuel", Context.MODE_PRIVATE);
+        int sort = fuel.getInt("sort", 0);
+        menu.findItem(R.id.sortAlpha).setChecked(sort == 1);
+        menu.findItem(R.id.sortTime).setChecked(sort == 2);
         return true;
     }
 
@@ -246,8 +260,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.add) {
-            descriptionEdit = Dialog_description_edit.getInstance(userEdit, (long) inventarny_spisok_data.size());
-            descriptionEdit.show(getSupportFragmentManager(), "edit");
+            if (isNetworkAvailable()) {
+                descriptionEdit = Dialog_description_edit.getInstance(userEdit, (long) InventoryList.length);
+                descriptionEdit.show(getSupportFragmentManager(), "edit");
+            } else {
+                Dialog_no_internet noInternet = new Dialog_no_internet();
+                noInternet.show(getSupportFragmentManager(), "internet");
+            }
         }
         if (id == R.id.exit) {
             mAuth.signOut();
@@ -256,6 +275,44 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             userpass.setVisibility(View.VISIBLE);
             login.setVisibility(View.VISIBLE);
             textView.setVisibility(View.VISIBLE);
+        }
+        if (id == R.id.sortAlpha) {
+            SharedPreferences fuel = getSharedPreferences("fuel", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = fuel.edit();
+            if (item.isChecked()) {
+                editor.putInt("sort", 0);
+                editor.apply();
+                Arrays.sort(InventoryList);
+            } else {
+                editor.putInt("sort", 1);
+                editor.apply();
+                Arrays.sort(InventoryList);
+            }
+            inventarny_spisok.clear();
+            for (InventoryList inventoryList : InventoryList) {
+                inventarny_spisok.add(inventoryList.data01 + ". " + inventoryList.data02);
+            }
+            arrayAdapter.notifyDataSetChanged();
+            supportInvalidateOptionsMenu();
+        }
+        if (id == R.id.sortTime) {
+            SharedPreferences fuel = getSharedPreferences("fuel", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = fuel.edit();
+            if (item.isChecked()) {
+                editor.putInt("sort", 0);
+                editor.apply();
+                Arrays.sort(InventoryList);
+            } else {
+                editor.putInt("sort", 2);
+                editor.apply();
+                Arrays.sort(InventoryList);
+            }
+            inventarny_spisok.clear();
+            for (InventoryList inventoryList : InventoryList) {
+                inventarny_spisok.add(inventoryList.data01 + ". " + inventoryList.data02);
+            }
+            arrayAdapter.notifyDataSetChanged();
+            supportInvalidateOptionsMenu();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -269,48 +326,50 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 mDatabase.child("equipments").addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        SharedPreferences fuel = getSharedPreferences("fuel", Context.MODE_PRIVATE);
-                        Type type2 = new TypeToken<ArrayList<ArrayList<Long>>>() {}.getType();
-                        Gson gson = new Gson();
-                        String notify2 = fuel.getString("notify", "");
-                        ArrayList<ArrayList<Long>> temp;
-                        if (!notify2.equals("")) {
-                            temp = new ArrayList<>(gson.fromJson(notify2, type2));
-                        } else {
-                            temp = new ArrayList<>();
+                        int size = 0;
+                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                            if (postSnapshot.getValue() instanceof HashMap) {
+                                HashMap hashMap = (HashMap) postSnapshot.getValue();
+                                if (hashMap.size() > 12) {
+                                    size++;
+                                }
+                            }
                         }
-                        int i = 0;
-                        inventarny_spisok.clear();
-                        inventarny_spisok_data.clear();
+                        InventoryList = new InventoryList[size];
+                        size = 0;
                         for (DataSnapshot data : dataSnapshot.getChildren()) {
                             if (data.getValue() instanceof HashMap) {
                                 HashMap hashMap = (HashMap) data.getValue();
-                                inventarny_spisok_data.add(hashMap);
                                 if (hashMap.size() > 12) {
-                                    String uid = (String) hashMap.get("uid");
-                                    if (uid == null)
-                                        hashMap.put("uid", data.getKey());
-                                    long data11 = 0;
-                                    if (hashMap.get("data11") != null)
-                                        data11 = (long) hashMap.get("data11");
-                                    inventarny_spisok.add(hashMap.get("data01") + ". " + hashMap.get("data02"));
-                                    ArrayList<Long> notify1 = new ArrayList<>();
-                                    notify1.add((long) hashMap.get("data01"));
-                                    notify1.add(data11);
-                                    if (temp.size() < i) {
-                                        if (temp.size() == 0)
-                                            notify1.add(1L);
-                                        else if (temp.get(i).get(1) != data11)
-                                            notify1.add(1L);
-                                        else
-                                            notify1.add(0L);
-                                    } else {
-                                        notify1.add(1L);
-                                    }
-                                    notifications.add(notify1);
-                                    i++;
+                                    Object editedAt = hashMap.get("editedAt");
+                                    Object editedBy = hashMap.get("editedBy");
+                                    if (hashMap.get("editedAt") == null)
+                                        editedAt = 0L;
+                                    if (hashMap.get("editedBy") == null)
+                                        editedBy = "";
+                                    InventoryList[size] = new InventoryList(MainActivity.this,
+                                            (String) hashMap.get("createdBy"),
+                                            (long) hashMap.get("data01"),
+                                            (String) hashMap.get("data02"),
+                                            (String) hashMap.get("data03"),
+                                            (String) hashMap.get("data04"),
+                                            (String) hashMap.get("data05"),
+                                            (String) hashMap.get("data06"),
+                                            (String) hashMap.get("data07"),
+                                            (String) hashMap.get("data08"),
+                                            (String) hashMap.get("data09"),
+                                            (String) hashMap.get("data10"),
+                                            (long) hashMap.get("data11"),
+                                            (String) hashMap.get("data12"), data.getKey(),
+                                            (long) editedAt, (String) editedBy);
+                                    size++;
                                 }
                             }
+                        }
+                        Arrays.sort(InventoryList);
+                        inventarny_spisok.clear();
+                        for (InventoryList inventoryList : InventoryList) {
+                            inventarny_spisok.add(inventoryList.data01 + ". " + inventoryList.data02);
                         }
                         listView.setVisibility(View.VISIBLE);
                         useremail.setVisibility(View.GONE);
@@ -319,10 +378,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         textView.setVisibility(View.GONE);
                         arrayAdapter.notifyDataSetChanged();
                         progressBar.setVisibility(View.GONE);
-                        SharedPreferences.Editor editor = fuel.edit();
-                        editor.putString("fuel_data", gson.toJson(inventarny_spisok_data));
-                        editor.putString("notify", gson.toJson(notifications));
-                        editor.apply();
+
                         Intent intent = new Intent(MainActivity.this, ReceiverSetAlarm.class);
                         sendBroadcast(intent);
                     }
@@ -370,12 +426,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 String g = fuel.getString("fuel_data", "");
                 if (!g.equals("")) {
                     Gson gson = new Gson();
-                    Type type = new TypeToken<ArrayList<HashMap>>() {}.getType();
-                    inventarny_spisok_data.addAll(gson.fromJson(g, type));
-                    for (int i = 0; i < inventarny_spisok_data.size(); i++) {
-                        HashMap hashMap = inventarny_spisok_data.get(i);
-                        int data01 = (int) (double) hashMap.get("data01");
-                        inventarny_spisok.add(data01 + ". " + hashMap.get("data02"));
+                    Type type = new TypeToken<InventoryList[]>() {}.getType();
+                    InventoryList = gson.fromJson(g, type);
+                    for (InventoryList inventoryList : InventoryList) {
+                        inventarny_spisok.add(inventoryList.data01 + ". " + inventoryList.data02);
                     }
                     String us = fuel.getString("users", "");
                     Type type2 = new TypeToken<ArrayList<ArrayList<String>>>() {}.getType();
@@ -437,30 +491,54 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             viewHolder.button_popup.setOnClickListener(view -> {
-                showPopupMenu(viewHolder.button_popup, position, inventarny_spisok.get(position));
+                showPopupMenu(viewHolder.button_popup, position);
             });
-            long data;
-            if (inventarny_spisok_data.get(position).get("data11") instanceof Double) {
-                data = (long) (double) inventarny_spisok_data.get(position).get("data11");
-            } else {
-                if (inventarny_spisok_data.get(position).get("data11") != null)
-                    data = (long) inventarny_spisok_data.get(position).get("data11");
-                else data = 0;
-            }
-            GregorianCalendar g = new GregorianCalendar();
-            g.setTimeInMillis(data);
+            GregorianCalendar g = (GregorianCalendar) Calendar.getInstance();
+            long real = g.getTimeInMillis();
             String dataLong = "";
-            GregorianCalendar real = (GregorianCalendar) Calendar.getInstance();
-            if (g.getTimeInMillis() - real.getTimeInMillis() > 0L && g.getTimeInMillis() - real.getTimeInMillis() < 45L * 24L * 60L * 60L * 1000L) {
-                dataLong = "<b><font color=#9a2828>Осталось " + (g.get(Calendar.DATE) - real.get(Calendar.DATE)) + " дней(-я)</font>";
-            } else if (g.getTimeInMillis() - real.getTimeInMillis() < 0L) {
-                dataLong = "<b><font color=#9a2828>Просрочено</font>";
+            String data8 = InventoryList[position].data08;
+            if (data8 != null && !data8.equals("")) {
+                String[] t1 = data8.split("-");
+                GregorianCalendar calendar = new GregorianCalendar();
+                String data09 = InventoryList[position].data09;
+                String data10 = InventoryList[position].data10;
+                if (data09 != null && !data09.equals("")) {
+                    String[] t2 = data09.split("-");
+                    calendar.set(Integer.parseInt(t2[0]), Integer.parseInt(t2[1]) - 1, Integer.parseInt(t2[2]));
+                    long t2l = calendar.getTimeInMillis();
+                    if (data10 != null && !data10.equals("")) {
+                        String[] t3 = data10.split("-");
+                        calendar.set(Integer.parseInt(t3[0]), Integer.parseInt(t3[1]) - 1, Integer.parseInt(t3[2]));
+                        long t3l = calendar.getTimeInMillis();
+                        if (t2l < t3l) {
+                            g.set(Integer.parseInt(t1[0]), Integer.parseInt(t3[1]) - 1, Integer.parseInt(t3[2]));
+                            if (g.getTimeInMillis() - real > 0L && g.getTimeInMillis() - real < 45L * 24L * 60L * 60L * 1000L) {
+                                long dat = g.getTimeInMillis() - real;
+                                g.setTimeInMillis(dat);
+                                dataLong = "<br><font color=#9a2828>Осталось " +
+                                        (g.get(Calendar.DAY_OF_YEAR) - 1) + " дней(-я)</font>";
+                            } else if (g.getTimeInMillis() - real < 0L) {
+                                dataLong = "<br><font color=#9a2828>Просрочено</font>";
+                            }
+                        }
+                    }
+                } else {
+                    g.set(Integer.parseInt(t1[0]), Integer.parseInt(t1[1]) - 1, Integer.parseInt(t1[2]));
+                    if (g.getTimeInMillis() - real > 0L && g.getTimeInMillis() - real < 45L * 24L * 60L * 60L * 1000L) {
+                        long dat = g.getTimeInMillis() - real;
+                        g.setTimeInMillis(dat);
+                        dataLong = "<br><font color=#9a2828>Осталось " +
+                                (g.get(Calendar.DAY_OF_YEAR) - 1) + " дней(-я)</font>";
+                    } else if (g.getTimeInMillis() - real < 0L) {
+                        dataLong = "<br><font color=#9a2828>Просрочено</font>";
+                    }
+                }
             }
             viewHolder.textView.setText(Html.fromHtml(inventarny_spisok.get(position) + dataLong));
             return convertView;
         }
 
-        private void showPopupMenu(ImageView imageView, int position, String name) {
+        private void showPopupMenu(ImageView imageView, int position) {
             PopupMenu popup = new PopupMenu(MainActivity.this, imageView);
             MenuInflater inflater = popup.getMenuInflater();
             inflater.inflate(R.menu.popup, popup.getMenu());

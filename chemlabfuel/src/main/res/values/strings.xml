@@ -11,4 +11,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="remove">Удалить</string>
     <string name="add">Добавить</string>
+    <string name="sorting_by_alphabet">Сортировка по алфавиту</string>
+    <string name="sorting_by_time">Сортировка по времени</string>
 </resources>

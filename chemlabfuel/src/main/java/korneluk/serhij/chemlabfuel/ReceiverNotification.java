@@ -13,21 +13,14 @@ import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-
 public class ReceiverNotification extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        sendNotification(context, intent.getStringExtra("name"),
-                intent.getLongExtra("data", 0),
-                intent.getIntExtra("id", 205));
+        sendNotification(context);
     }
 
-    private void sendNotification(Context context, String name, long data, int id) {
-        GregorianCalendar g = new GregorianCalendar();
-        g.setTimeInMillis(data);
+    private void sendNotification(Context context) {
         Intent notificationIntent = new Intent(context, SplashActivity.class);
         PendingIntent contentIntent = PendingIntent.getActivity(context,
                 0, notificationIntent,
@@ -39,9 +32,8 @@ public class ReceiverNotification extends BroadcastReceiver {
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setLargeIcon(BitmapFactory.decodeResource(res, R.drawable.ic_launcher))
                 .setAutoCancel(true)
-                .setContentTitle(name)
-                .setContentText(g.get(Calendar.DATE) + "." + (g.get(Calendar.MONTH) + 1) + "." +
-                        g.get(Calendar.YEAR) + " истекает срок следующей аттестации, поверки, калибровки");
+                .setContentTitle("Истекает срок")
+                .setContentText("следующей аттестации, поверки, калибровки");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             builder.setChannelId("korneluk.serhij.chemlabfuel");
         }
@@ -53,6 +45,8 @@ public class ReceiverNotification extends BroadcastReceiver {
                     "chemlabfuel", NotificationManager.IMPORTANCE_DEFAULT);
             notificationManager.createNotificationChannel(channel);
         }
-        notificationManager.notify(id, notification);
+        notificationManager.notify(205, notification);
+        Intent intent = new Intent(context, ReceiverSetAlarm.class);
+        context.sendBroadcast(intent);
     }
 }
