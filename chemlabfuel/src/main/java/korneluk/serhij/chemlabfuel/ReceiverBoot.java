@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 public class ReceiverBoot extends BroadcastReceiver {
+
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent != null && intent.getAction() != null &&
@@ -14,6 +15,5 @@ public class ReceiverBoot extends BroadcastReceiver {
             Intent intent1 = new Intent(context, ReceiverSetAlarm.class);
             context.sendBroadcast(intent1);
         }
-
     }
 }

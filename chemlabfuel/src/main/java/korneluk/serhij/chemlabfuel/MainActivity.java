@@ -9,7 +9,7 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
-import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
 import android.text.style.AbsoluteSizeSpan;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -24,6 +24,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -51,7 +52,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener, Dialog_context_menu.Dialog_context_menu_Listener {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener, Dialog_context_menu.Dialog_context_menu_Listener, Dialog_delete_confirm.Dialog_delete_confirm_listener, Dialog_date.Dialog_date_listener {
 
     private FirebaseAuth mAuth;
     private EditText useremail;
@@ -66,6 +67,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private ArrayAdapter<String> arrayAdapter;
     private final ArrayList<ArrayList<String>> users = new ArrayList<>();
     private final ArrayList<ArrayList<Long>> notifications = new ArrayList<>();
+    private TextView textView;
+    private Dialog_description_edit descriptionEdit;
+    private String userEdit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,37 +96,38 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             password = userpass.getText().toString();
             mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(MainActivity.this, task -> {
                 if (task.isSuccessful()) {
-                    // Sign in success, update UI with signed-in useremail's information
-                    Toast.makeText(MainActivity.this, "Authentication success",
-                            Toast.LENGTH_SHORT).show();
+                    // Sign in success, update UI with the signed-in useremail's information
                     FirebaseUser user1 = mAuth.getCurrentUser();
                     updateUI(user1);
                 } else {
                     // If sign in fails, display a message to the useremail.
-                    Toast.makeText(MainActivity.this, "Authentication failed.",
-                            Toast.LENGTH_SHORT).show();
+                    LinearLayout layout = new LinearLayout(this);
+                    layout.setBackgroundResource(R.color.colorPrimary);
+                    TextView toast = new TextView(this);
+                    toast.setTextColor(getResources().getColor(R.color.colorIcons));
+                    toast.setPadding(10, 10, 10, 10);
+                    toast.setText("Неверный логин или пароль");
+                    toast.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+                    layout.addView(toast);
+                    Toast mes = new Toast(this);
+                    mes.setDuration(Toast.LENGTH_LONG);
+                    mes.setView(layout);
+                    mes.show();
                     updateUI(null);
                 }
             });
         });
+        textView = findViewById(R.id.link);
+        textView.setClickable(true);
+        textView.setMovementMethod(LinkMovementMethod.getInstance());
+        String text = "<a href='https://github.com/serhijko/ChemLabFuel/blob/master/README.md'>Политика конфиденциальности</a>";
+        textView.setText(Html.fromHtml(text));
         setToolbarTheme();
     }
 
     private void setToolbarTheme() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         TextView title_toolbar = findViewById(R.id.title_toolbar);
-        title_toolbar.setOnClickListener(view -> {
-            title_toolbar.setHorizontallyScrolling(true);
-            title_toolbar.setFreezesText(true);
-            title_toolbar.setMarqueeRepeatLimit(-1);
-            if (title_toolbar.isSelected()) {
-                title_toolbar.setEllipsize(TextUtils.TruncateAt.END);
-                title_toolbar.setSelected(false);
-            } else {
-                title_toolbar.setEllipsize(TextUtils.TruncateAt.MARQUEE);
-                title_toolbar.setSelected(true);
-            }
-        });
         title_toolbar.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         setSupportActionBar(toolbar);
         title_toolbar.setText(R.string.app_main);
@@ -140,6 +145,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         String fn = "";
         String ln = "";
+        String fnG = "";
+        String lnG = "";
+        String zero1 = "";
+        String zero2 = "";
         String editedString = "";
         if (inventarny_spisok_data.get(position).get("editedAt") != null && inventarny_spisok_data.get(position).get("editedBy") != null) {
             long edited;
@@ -157,7 +166,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
             GregorianCalendar c = new GregorianCalendar();
             c.setTimeInMillis(edited);
-            editedString = " Изменено " + c.get(Calendar.DATE) + "." + (c.get(Calendar.MONTH) + 1) + "." + c.get(Calendar.YEAR) + " " + fn + " " + ln;
+            if (c.get(Calendar.DATE) < 10) zero1 = "0";
+            if (c.get(Calendar.MONTH) < 9) zero2 = "0";
+            editedString = " Изменено " + zero1 + c.get(Calendar.DATE) + "." + zero2 + (c.get(Calendar.MONTH) + 1) + "." + c.get(Calendar.YEAR) + " " + fn + " " + ln;
+        }
+        String createdBy = (String) inventarny_spisok_data.get(position).get("createdBy");
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).get(0).contains(createdBy)) {
+                fnG = users.get(i).get(1);
+                lnG = users.get(i).get(2);
+                break;
+            }
         }
         String data02 = (String) inventarny_spisok_data.get(position).get("data02");
         String builder = "<strong>Марка, тип</strong><br>" + inventarny_spisok_data.get(position).get("data03") + "<br><br>" +
@@ -168,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 "<strong>Дата следующей аттестации, поверки, калибровки</strong><br>" + inventarny_spisok_data.get(position).get("data08") + "<br><br>" +
                 "<strong>Дата консервации</strong><br>" + inventarny_spisok_data.get(position).get("data09") + "<br><br>" +
                 "<strong>Дата расконсервации</strong><br>" + inventarny_spisok_data.get(position).get("data10") + "<br><br>" +
-                "<strong>Ответственный</strong><br>" + fn + " " + ln + "<br><br>" +
+                "<strong>Ответственный</strong><br>" + fnG + " " + lnG + "<br><br>" +
                 "<strong>Примечания</strong><br>" + inventarny_spisok_data.get(position).get("data12") + editedString;
         Dialog_description description = Dialog_description.getInstance(data02, builder);
         description.show(getSupportFragmentManager(), "description");
@@ -183,8 +202,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onDialogEditPosition(int position) {
-        Dialog_description_edit descriptionEdit = Dialog_description_edit.getInstance((String) inventarny_spisok_data.get(position).get("uid"), (String) inventarny_spisok_data.get(position).get("data02"), (String) inventarny_spisok_data.get(position).get("data03"), (String) inventarny_spisok_data.get(position).get("data04"), (String) inventarny_spisok_data.get(position).get("data05"), (String) inventarny_spisok_data.get(position).get("data06"), (String) inventarny_spisok_data.get(position).get("data07"), (String) inventarny_spisok_data.get(position).get("data08"), (String) inventarny_spisok_data.get(position).get("data09"), (String) inventarny_spisok_data.get(position).get("data10"));
+        descriptionEdit = Dialog_description_edit.getInstance(userEdit, (String) inventarny_spisok_data.get(position).get("uid"), (String) inventarny_spisok_data.get(position).get("data02"), (String) inventarny_spisok_data.get(position).get("data03"), (String) inventarny_spisok_data.get(position).get("data04"), (String) inventarny_spisok_data.get(position).get("data05"), (String) inventarny_spisok_data.get(position).get("data06"), (String) inventarny_spisok_data.get(position).get("data07"), (String) inventarny_spisok_data.get(position).get("data08"), (String) inventarny_spisok_data.get(position).get("data09"), (String) inventarny_spisok_data.get(position).get("data10"), (String) inventarny_spisok_data.get(position).get("data12"));
         descriptionEdit.show(getSupportFragmentManager(), "edit");
+    }
+
+    @Override
+    public void onDialogDeleteClick(int position) {
+        Dialog_delete_confirm confirm = Dialog_delete_confirm.getInstance((String) inventarny_spisok_data.get(position).get("data02"), position);
+        confirm.show(getSupportFragmentManager(), "confirm");
+    }
+
+    @Override
+    public void delete_data(int position) {
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase.child("equipments").child((String) inventarny_spisok_data.get(position).get("uid")).removeValue();
+    }
+
+    @Override
+    public void set_date(int textView, int year, int month, int dayOfMonth) {
+        descriptionEdit.set_data(textView, year, month, dayOfMonth);
     }
 
     @Override
@@ -209,12 +245,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
+        if (id == R.id.add) {
+            descriptionEdit = Dialog_description_edit.getInstance(userEdit, (long) inventarny_spisok_data.size());
+            descriptionEdit.show(getSupportFragmentManager(), "edit");
+        }
         if (id == R.id.exit) {
             mAuth.signOut();
             listView.setVisibility(View.GONE);
             useremail.setVisibility(View.VISIBLE);
             userpass.setVisibility(View.VISIBLE);
             login.setVisibility(View.VISIBLE);
+            textView.setVisibility(View.VISIBLE);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -242,30 +283,40 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         inventarny_spisok.clear();
                         inventarny_spisok_data.clear();
                         for (DataSnapshot data : dataSnapshot.getChildren()) {
-                            HashMap hashMap = (HashMap) data.getValue();
-                            inventarny_spisok_data.add(hashMap);
-                            if (hashMap != null) {
-                                long data11 = 0;
-                                if (hashMap.get("data11") != null)
-                                    data11 = (long) hashMap.get("data11");
-                                inventarny_spisok.add(hashMap.get("data01") + ". " + hashMap.get("data02"));
-                                ArrayList<Long> notify1 = new ArrayList<>();
-                                notify1.add((long) hashMap.get("data01"));
-                                notify1.add(data11);
-                                if (temp.size() == 0)
-                                    notify1.add(1L);
-                                else if (temp.get(i).get(1) != data11)
-                                    notify1.add(1L);
-                                else
-                                    notify1.add(0L);
-                                notifications.add(notify1);
-                                i++;
+                            if (data.getValue() instanceof HashMap) {
+                                HashMap hashMap = (HashMap) data.getValue();
+                                inventarny_spisok_data.add(hashMap);
+                                if (hashMap.size() > 12) {
+                                    String uid = (String) hashMap.get("uid");
+                                    if (uid == null)
+                                        hashMap.put("uid", data.getKey());
+                                    long data11 = 0;
+                                    if (hashMap.get("data11") != null)
+                                        data11 = (long) hashMap.get("data11");
+                                    inventarny_spisok.add(hashMap.get("data01") + ". " + hashMap.get("data02"));
+                                    ArrayList<Long> notify1 = new ArrayList<>();
+                                    notify1.add((long) hashMap.get("data01"));
+                                    notify1.add(data11);
+                                    if (temp.size() < i) {
+                                        if (temp.size() == 0)
+                                            notify1.add(1L);
+                                        else if (temp.get(i).get(1) != data11)
+                                            notify1.add(1L);
+                                        else
+                                            notify1.add(0L);
+                                    } else {
+                                        notify1.add(1L);
+                                    }
+                                    notifications.add(notify1);
+                                    i++;
+                                }
                             }
                         }
                         listView.setVisibility(View.VISIBLE);
                         useremail.setVisibility(View.GONE);
                         userpass.setVisibility(View.GONE);
                         login.setVisibility(View.GONE);
+                        textView.setVisibility(View.GONE);
                         arrayAdapter.notifyDataSetChanged();
                         progressBar.setVisibility(View.GONE);
                         SharedPreferences.Editor editor = fuel.edit();
@@ -286,6 +337,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         for (DataSnapshot data : snapshot.getChildren()) {
                             String key = data.getKey();
+                            if (mAuth.getUid().contains(key)) {
+                                userEdit = key;
+                            }
                             for (DataSnapshot data2 : data.getChildren()) {
                                 if (data2.getValue() instanceof HashMap) {
                                     HashMap hashMap = (HashMap) data2.getValue();
@@ -337,6 +391,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 useremail.setVisibility(View.GONE);
                 userpass.setVisibility(View.GONE);
                 login.setVisibility(View.GONE);
+                textView.setVisibility(View.GONE);
                 progressBar.setVisibility(View.GONE);
             }
         } else {
@@ -344,6 +399,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             useremail.setVisibility(View.VISIBLE);
             userpass.setVisibility(View.VISIBLE);
             login.setVisibility(View.VISIBLE);
+            textView.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
         }
     }
@@ -385,10 +441,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             });
             long data;
             if (inventarny_spisok_data.get(position).get("data11") instanceof Double) {
-                data = (long) inventarny_spisok_data.get(position).get("data11");
+                data = (long) (double) inventarny_spisok_data.get(position).get("data11");
             } else {
                 if (inventarny_spisok_data.get(position).get("data11") != null)
-                    data = (long) (double) inventarny_spisok_data.get(position).get("data11");
+                    data = (long) inventarny_spisok_data.get(position).get("data11");
                 else data = 0;
             }
             GregorianCalendar g = new GregorianCalendar();
@@ -396,9 +452,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             String dataLong = "";
             GregorianCalendar real = (GregorianCalendar) Calendar.getInstance();
             if (g.getTimeInMillis() - real.getTimeInMillis() > 0L && g.getTimeInMillis() - real.getTimeInMillis() < 45L * 24L * 60L * 60L * 1000L) {
-                dataLong = "<b><font color=#D81B60>Осталось " + (g.get(Calendar.DATE) - real.get(Calendar.DATE)) + " дней(-я)</font>";
+                dataLong = "<b><font color=#9a2828>Осталось " + (g.get(Calendar.DATE) - real.get(Calendar.DATE)) + " дней(-я)</font>";
             } else if (g.getTimeInMillis() - real.getTimeInMillis() < 0L) {
-                dataLong = "<b><font color=#D81B60>Просрочено</font>";
+                dataLong = "<b><font color=#9a2828>Просрочено</font>";
             }
             viewHolder.textView.setText(Html.fromHtml(inventarny_spisok.get(position) + dataLong));
             return convertView;
@@ -419,6 +475,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 popup.dismiss();
                 if (menuItem.getItemId() == R.id.menu_editor) {
                     onDialogEditPosition(position);
+                    return true;
+                }
+                if (menuItem.getItemId() == R.id.menu_remove) {
+                    onDialogDeleteClick(position);
                     return true;
                 }
                 return false;
