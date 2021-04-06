@@ -1,6 +1,7 @@
 package korneluk.serhij.chemlabfuel;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
@@ -99,13 +100,13 @@ public class Dialog_description_edit extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_description_edit, null);
         TextView textViewTitle = view.findViewById(R.id.textViewTitle);
+
         EditText editText2 = view.findViewById(R.id.editText2e);
         EditText editText3 = view.findViewById(R.id.editText3e);
         EditText editText4 = view.findViewById(R.id.editText4e);
         EditText editText5 = view.findViewById(R.id.editText5e);
         EditText editText6 = view.findViewById(R.id.editText6e);
         editText7 = view.findViewById(R.id.textView7e);
-        //EditText editText8 = view.findViewById(R.id.editText8e);
         editText9 = view.findViewById(R.id.textView9e);
         editText10 = view.findViewById(R.id.textView10e);
         EditText editText12 = view.findViewById(R.id.editText12e);
@@ -220,9 +221,9 @@ public class Dialog_description_edit extends DialogFragment {
                                 c.add(Calendar.YEAR, 20);
                                 data11 = c.getTimeInMillis();
                                 String zero1 = "";
-                                if (c.get(Calendar.DATE) > 10) zero1 = "0";
+                                if (c.get(Calendar.DATE) < 10) zero1 = "0";
                                 String zero2 = "";
-                                if (c.get(Calendar.MONTH) > 9) zero2 = "0";
+                                if (c.get(Calendar.MONTH) < 9) zero2 = "0";
                                 String[] t1 = data7_OldCheck.split("-");
                                 c.set(Integer.parseInt(t1[0]), (Integer.parseInt(t1[1]) - 1), Integer.parseInt(t1[2]));
                                 c.add(Calendar.MONTH, Integer.parseInt(data6_PeriodCheck));
@@ -291,6 +292,7 @@ public class Dialog_description_edit extends DialogFragment {
                     mDatabase.child("equipments").child(uid).child("editedAt").setValue(g.getTimeInMillis());
                     mDatabase.child("equipments").child(uid).child("editedBy").setValue(user);
                 }
+                getActivity().sendBroadcast(new Intent(getActivity(), ReceiverSetAlarm.class));
                 dialogInterface.cancel();
             } else {
                 LinearLayout layout = new LinearLayout(getActivity());

@@ -37,6 +37,13 @@
             android:theme="@style/Theme.ChemLabFuel.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ChemLabFuel" />
+        </activity>
+        <activity android:name=".ChemLabFuel"
+            android:label="@string/app_main"
+            android:theme="@style/Theme.ChemLabFuel.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
         <receiver android:name=".ReceiverNotification" />

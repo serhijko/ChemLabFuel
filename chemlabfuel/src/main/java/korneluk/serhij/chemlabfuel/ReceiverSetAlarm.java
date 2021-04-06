@@ -58,7 +58,7 @@ public class ReceiverSetAlarm extends BroadcastReceiver {
     private void Task(Context context) {
         new Thread(() -> {
             testData.clear();
-            if (MainActivity.InventoryList == null) {
+            if (ChemLabFuel.InventoryList == null) {
                 if (FirebaseAuth.getInstance().getCurrentUser() != null) {
                     if (isNetworkAvailable(context)) {
                         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -74,7 +74,7 @@ public class ReceiverSetAlarm extends BroadcastReceiver {
                                         }
                                     }
                                 }
-                                MainActivity.InventoryList = new InventoryList[size];
+                                ChemLabFuel.InventoryList = new InventoryList[size];
                                 size = 0;
                                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                                     if (data.getValue() instanceof HashMap) {
@@ -86,7 +86,7 @@ public class ReceiverSetAlarm extends BroadcastReceiver {
                                                 editedAt = 0L;
                                             if (hashMap.get("editedBy") == null)
                                                 editedBy = "";
-                                            MainActivity.InventoryList[size] = new InventoryList(context,
+                                            ChemLabFuel.InventoryList[size] = new InventoryList(context,
                                                     (String) hashMap.get("createdBy"),
                                                     (long) hashMap.get("data01"),
                                                     (String) hashMap.get("data02"),
@@ -109,7 +109,7 @@ public class ReceiverSetAlarm extends BroadcastReceiver {
                             }
 
                             @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
                             }
                         });
                     }
@@ -127,7 +127,7 @@ public class ReceiverSetAlarm extends BroadcastReceiver {
         long realtime = c.getTimeInMillis();
         c.set(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DATE), 8, 0, 0);
         long time = c.getTimeInMillis();
-        for (InventoryList inventory_list_datum : MainActivity.InventoryList) {
+        for (InventoryList inventory_list_datum : ChemLabFuel.InventoryList) {
             int data01 = (int) inventory_list_datum.data01;
             removeAlarm(context, data01);
             if (toDateAlarm != 0L) {
@@ -168,6 +168,7 @@ public class ReceiverSetAlarm extends BroadcastReceiver {
                             }
                         } else {
                             c.add(Calendar.DATE, (int) -toDateAlarm);
+                            setAlarm(context, c, data01);
                         }
                     }
                 }
