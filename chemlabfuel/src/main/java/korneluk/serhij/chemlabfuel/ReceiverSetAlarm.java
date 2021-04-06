@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
@@ -26,9 +27,31 @@ import java.util.HashMap;
 public class ReceiverSetAlarm extends BroadcastReceiver {
 
     private final ArrayList<String> testData = new ArrayList<>();
+    private long toDateAlarm = 45L;
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        SharedPreferences fuel = context.getSharedPreferences("fuel", Context.MODE_PRIVATE);
+        switch (fuel.getInt("notification", 0)) {
+            case 0:
+                toDateAlarm = 45L;
+                break;
+            case 1:
+                toDateAlarm = 30L;
+                break;
+            case 2:
+                toDateAlarm = 15L;
+                break;
+            case 3:
+                toDateAlarm = 10L;
+                break;
+            case 4:
+                toDateAlarm = 5L;
+                break;
+            case 5:
+                toDateAlarm = 0L;
+                break;
+        }
         Task(context);
     }
 
@@ -99,54 +122,64 @@ public class ReceiverSetAlarm extends BroadcastReceiver {
     }
 
     private void checkAlarm(Context context) {
-        long timer = 45L * 24L * 60L * 60L * 1000L;
+        long timer = toDateAlarm * 24L * 60L * 60L * 1000L;
         GregorianCalendar c = (GregorianCalendar) Calendar.getInstance();
         long realtime = c.getTimeInMillis();
         c.set(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DATE), 8, 0, 0);
         long time = c.getTimeInMillis();
         for (InventoryList inventory_list_datum : MainActivity.InventoryList) {
             int data01 = (int) inventory_list_datum.data01;
-            String data08 = inventory_list_datum.data08;
-            if (data08 != null && !data08.equals("")) {
-                String[] t1 = data08.split("-");
-                c.set(Integer.parseInt(t1[0]), Integer.parseInt(t1[1]), Integer.parseInt(t1[2]),
-                        8, 0, 0);
-                long timeset = c.getTimeInMillis();
-                long timeres = timeset - time;
-                if (timeres > -30 * 24L * 60L * 60L * 1000L && timeres < timer) {
-                    c.setTimeInMillis(time);
-                    if (realtime > time) {
-                        if (c.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY)
-                            c.add(Calendar.DATE, 3);
-                        else
-                            c.add(Calendar.DATE, 1);
-                    }
-                    setAlarm(context, c, data01);
-                } else if (timeres > timer) {
-                    GregorianCalendar calendar = new GregorianCalendar();
-                    String data09 = inventory_list_datum.data09;
-                    String data10 = inventory_list_datum.data10;
-                    if (data09 != null && !data09.equals("")) {
-                        String[] t2 = data09.split("-");
-                        calendar.set(Integer.parseInt(t2[0]), Integer.parseInt(t2[1]) - 1,
-                                Integer.parseInt(t2[2]));
-                        long t2l = calendar.getTimeInMillis();
-                        if (data10 != null && !data10.equals("")) {
-                            String[] t3 = data10.split("-");
-                            calendar.set(Integer.parseInt(t3[0]), Integer.parseInt(t3[1]) - 1,
-                                    Integer.parseInt(t3[2]));
-                            long t3l = calendar.getTimeInMillis();
-                            if (t2l < t3l) {
-                                c.add(Calendar.DATE, -45);
-                                setAlarm(context, c, data01);
-                            }
+            removeAlarm(context, data01);
+            if (toDateAlarm != 0L) {
+                String data08 = inventory_list_datum.data08;
+                if (data08 != null && !data08.equals("")) {
+                    String[] t1 = data08.split("-");
+                    c.set(Integer.parseInt(t1[0]), Integer.parseInt(t1[1]), Integer.parseInt(t1[2]),
+                            8, 0, 0);
+                    long timeSet = c.getTimeInMillis();
+                    long timeRes = timeSet - time;
+                    if (timeRes > -toDateAlarm * 24L * 60L * 60L * 1000L && timeRes < timer) {
+                        c.setTimeInMillis(time);
+                        if (realtime > time) {
+                            if (c.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY)
+                                c.add(Calendar.DATE, 3);
+                            else
+                                c.add(Calendar.DATE, 1);
                         }
-                    } else {
-                        c.add(Calendar.DATE, -45);
+                        setAlarm(context, c, data01);
+                    } else if (timeRes > timer) {
+                        GregorianCalendar calendar = new GregorianCalendar();
+                        String data09 = inventory_list_datum.data09;
+                        String data10 = inventory_list_datum.data10;
+                        if (data09 != null && !data09.equals("")) {
+                            String[] t2 = data09.split("-");
+                            calendar.set(Integer.parseInt(t2[0]), Integer.parseInt(t2[1]) - 1,
+                                    Integer.parseInt(t2[2]));
+                            long t2l = calendar.getTimeInMillis();
+                            if (data10 != null && !data10.equals("")) {
+                                String[] t3 = data10.split("-");
+                                calendar.set(Integer.parseInt(t3[0]), Integer.parseInt(t3[1]) - 1,
+                                        Integer.parseInt(t3[2]));
+                                long t3l = calendar.getTimeInMillis();
+                                if (t2l < t3l) {
+                                    c.add(Calendar.DATE, (int) -toDateAlarm);
+                                    setAlarm(context, c, data01);
+                                }
+                            }
+                        } else {
+                            c.add(Calendar.DATE, (int) -toDateAlarm);
+                        }
                     }
                 }
             }
         }
+    }
+
+    private void removeAlarm(Context context, int requestCode) {
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        PendingIntent pIntent = PendingIntent.getBroadcast(context, requestCode,
+                new Intent(context, ReceiverNotification.class), 0);
+        alarmManager.cancel(pIntent);
     }
 
     private void setAlarm(Context context, GregorianCalendar c, int requestCode) {

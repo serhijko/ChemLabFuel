@@ -5,12 +5,34 @@
     <string name="prompt_password">Пароль</string>
     <string name="action_sign_in">Войти</string>
     <string name="exit">Выйти</string>
-    <string name="open_menu">Открыть меню</string>
-    <string name="edit">Редактировать</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="remove">Удалить</string>
-    <string name="add">Добавить</string>
+    <string name="today">Сегодня</string>
+    <string name="minus_1_year">−1 год</string>
+    <string name="plus_1_year">+1 год</string>
+    <string name="equipment_name">Наименование оборудования (ИО, СИ)</string>
+    <string name="mark_type">Марка, тип</string>
+    <string name="serial_number">Заводской номер (инв. номер)</string>
+    <string name="year_of_release_commissioning">Год выпуска (ввода в эксплуатацию)</string>
+    <string name="calibration_intervals">Периодичность метролог. аттестации, поверки, калибровки, мес.</string>
+    <string name="last_calibration_date">Дата последней аттестации, поверки, калибровки</string>
+    <string name="pick_date">Выберите дату</string>
+    <string name="conservation_date">Дата консервации</string>
+    <string name="reactivation_date">Дата расконсервации</string>
+    <string name="notes">Примечания</string>
     <string name="sorting_by_alphabet">Сортировка по алфавиту</string>
     <string name="sorting_by_time">Сортировка по времени</string>
+    <string name="settings">Настройки</string>
+    <string name="title_activity_settings">Настройки</string>
+    <string name="edit">Редактировать</string>
+    <string name="delete">Удалить</string>
+    <string name="notifications">Уведомления:</string>
+    <string name="remove_confirm">Вы действительно хотите удалить \"%1$s\"?</string>
+    <string name="remove_question">Удалить?</string>
+    <string name="cancel">Отмена</string>
+    <string name="text_size">Размер текста (%1$d)</string>
+    <string name="good">Хорошо</string>
+    <string name="error">Ошибка</string>
+    <string name="save">Сохранить</string>
+    <string name="add_entry">Добавить запись</string>
+    <string name="set_date">%1$d-%2$s%3$d-%4$s%5$d</string>
+    <!--%1$s is a string and %2$d is a decimal number-->
 </resources>

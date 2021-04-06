@@ -6,7 +6,6 @@
     android:orientation="vertical"
     tools:context=".Dialog_date">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
         android:id="@+id/title"
         android:layout_width="match_parent"
@@ -29,7 +28,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:padding="10dp"
-            android:text="Сегодня"
+            android:text="@string/today"
             android:textColor="@color/colorPrimary_text" />
 
         <TextView
@@ -39,7 +38,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:padding="10dp"
-            android:text="-1 год"
+            android:text="@string/minus_1_year"
             android:textColor="@color/colorPrimary_text" />
 
         <TextView
@@ -49,7 +48,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:padding="10dp"
-            android:text="+1 год"
+            android:text="@string/plus_1_year"
             android:textColor="@color/colorPrimary_text" />
 
     </LinearLayout>

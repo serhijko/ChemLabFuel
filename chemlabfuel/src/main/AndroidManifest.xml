@@ -11,9 +11,9 @@
         android:allowBackup="true"
         android:backupAgent=".MyBackupAgent"
         android:fullBackupContent="true"
-        android:restoreAnyVersion="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:restoreAnyVersion="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ChemLabFuel"
@@ -29,8 +29,15 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity"
-            android:theme="@style/Theme.ChemLabFuel.NoActionBar"
-            android:label="@string/app_main">
+            android:label="@string/app_main"
+            android:theme="@style/Theme.ChemLabFuel.NoActionBar">
+        </activity>
+        <activity android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:theme="@style/Theme.ChemLabFuel.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
         </activity>
         <receiver android:name=".ReceiverNotification" />
         <receiver android:name=".ReceiverSetAlarm" />

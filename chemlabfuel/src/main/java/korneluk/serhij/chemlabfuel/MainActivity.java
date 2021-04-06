@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private ListView listView;
     private ProgressBar progressBar;
     private final ArrayList<String> inventarny_spisok = new ArrayList<>();
-    //private final ArrayList<ArrayMap<String, String>> inventarny_spisok_data = new ArrayList<>();
     private ArrayAdapter<String> arrayAdapter;
     private final ArrayList<ArrayList<String>> users = new ArrayList<>();
     private TextView textView;
@@ -76,6 +75,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if (getIntent().getExtras() != null) {
+            if (getIntent().getExtras().getBoolean("notifications", false)) {
+                SharedPreferences fuel = getSharedPreferences("fuel", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = fuel.edit();
+                editor.putInt("sort", 2);
+                editor.apply();
+            }
+        }
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
         useremail = findViewById(R.id.username);
@@ -83,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         login = findViewById(R.id.login);
         listView = findViewById(R.id.listView);
         progressBar = findViewById(R.id.loading);
-        arrayAdapter = new ListAdapter(this);
+        arrayAdapter = new ListAdapter();
         listView.setAdapter(arrayAdapter);
         listView.setOnItemClickListener(this);
         listView.setOnItemLongClickListener(this);
@@ -132,6 +139,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         title_toolbar.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         setSupportActionBar(toolbar);
         title_toolbar.setText(R.string.app_main);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        overridePendingTransition(R.anim.alphain, R.anim.alphaout);
     }
 
     @Override
@@ -314,6 +327,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             arrayAdapter.notifyDataSetChanged();
             supportInvalidateOptionsMenu();
         }
+        if (id == R.id.settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -379,8 +395,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         arrayAdapter.notifyDataSetChanged();
                         progressBar.setVisibility(View.GONE);
 
-                        Intent intent = new Intent(MainActivity.this, ReceiverSetAlarm.class);
-                        sendBroadcast(intent);
+                        sendBroadcast(new Intent(MainActivity.this, ReceiverSetAlarm.class));
                     }
 
                     @Override
@@ -472,8 +487,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private class ListAdapter extends ArrayAdapter<String> {
 
-        ListAdapter(@NonNull Context context) {
-            super(context, R.layout.simple_list_item, inventarny_spisok);
+        private final SharedPreferences fuel;
+
+        ListAdapter() {
+            super(MainActivity.this, R.layout.simple_list_item, inventarny_spisok);
+            fuel = getSharedPreferences("fuel", Context.MODE_PRIVATE);
         }
 
         @NonNull
@@ -535,6 +553,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
             }
             viewHolder.textView.setText(Html.fromHtml(inventarny_spisok.get(position) + dataLong));
+            viewHolder.textView.setTextSize(fuel.getInt("fontSize", 18));
             return convertView;
         }
 

@@ -25,7 +25,6 @@ import java.util.GregorianCalendar;
  */
 public class Dialog_date extends DialogFragment {
 
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_DATE = "date";
     private static final String ARG_VIEW = "textView";
@@ -42,7 +41,6 @@ public class Dialog_date extends DialogFragment {
      * @param title Parameter 3.
      * @return A new instance of fragment Dialog_date.
      */
-    // TODO: Rename and change types and number of parameters
     static Dialog_date getInstance(long date, int textView, String title) {
         Dialog_date descriptionFragment = new Dialog_date();
         Bundle args = new Bundle();
