@@ -19,17 +19,18 @@ public class Dialog_delete_confirm extends DialogFragment {
 
     private Dialog_delete_confirm_listener listener;
 
-    static Dialog_delete_confirm getInstance(String title, int position) {
+    static Dialog_delete_confirm getInstance(String title, int groupPosition, int position) {
         Dialog_delete_confirm description = new Dialog_delete_confirm();
         Bundle bundle = new Bundle();
         bundle.putString("title", title);
+        bundle.putInt("groupPosition", groupPosition);
         bundle.putInt("position", position);
         description.setArguments(bundle);
         return description;
     }
 
     interface Dialog_delete_confirm_listener {
-        void delete_data(int position);
+        void delete_data(int groupPosition, int position);
     }
 
     @Override
@@ -65,7 +66,11 @@ public class Dialog_delete_confirm extends DialogFragment {
         textView.setTextColor(getResources().getColor(R.color.colorPrimary_text));
         linearLayout.addView(textView);
         ad.setView(linearLayout);
-        ad.setPositiveButton(R.string.delete, (dialogInterface, i) -> listener.delete_data(getArguments().getInt("position")));
+        ad.setPositiveButton(R.string.delete, (dialogInterface, i) -> {
+            listener.delete_data(
+                    getArguments().getInt("groupPosition", -1),
+                    getArguments().getInt("position"));
+        });
         ad.setNegativeButton(R.string.cancel, (dialogInterface, i) -> dialogInterface.cancel());
         AlertDialog alertDialog = ad.create();
         alertDialog.setOnShowListener(dialogInterface -> {

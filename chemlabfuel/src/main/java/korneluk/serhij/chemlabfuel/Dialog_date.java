@@ -72,7 +72,7 @@ public class Dialog_date extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_date, null);
         TextView today = view.findViewById(R.id.today);
-        TextView textView1 = view.findViewById(R.id.textView1);
+        TextView textView1 = view.findViewById(R.id.textView1C);
         TextView textView2 = view.findViewById(R.id.textView2);
         TextView title = view.findViewById(R.id.title);
         title.setText(getArguments().getString(ARG_TITLE));

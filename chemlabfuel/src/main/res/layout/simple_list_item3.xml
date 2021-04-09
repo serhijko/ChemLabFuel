@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    tools:ignore="UseCompoundDrawables">
+
+    <TextView
+        android:id="@+id/label3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:drawablePadding="10dp"
+        android:gravity="center_vertical"
+        android:paddingLeft="50dp"
+        android:paddingStart="50dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="18sp"
+        tools:ignore="RtlSymmetry" />
+
+    <ImageView
+        android:id="@+id/button_popup3"
+        android:layout_width="24dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/btn_drawable"
+        android:contentDescription="@string/edit"
+        android:src="@drawable/button_with_three_dots" />
+</LinearLayout>

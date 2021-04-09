@@ -34,7 +34,32 @@
     <string name="save">Сохранить</string>
     <string name="add_entry">Добавить запись</string>
     <string name="set_date">%1$d-%2$s%3$d-%4$s%5$d</string>
+    <!--%1$s is a string and %2$d is a decimal number-->
     <string name="equipments">Оборудование</string>
     <string name="reagents">Реактивы</string>
-    <!--%1$s is a string and %2$d is a decimal number-->
+    <string name="reagent_name">Наименование реактива</string>
+    <string name="lot">Партия</string>
+    <string name="supplier">Поставщик</string>
+    <string name="date_of_receiving">Дата получения</string>
+    <string name="complaints">Претензии</string>
+    <string name="qualification">Квалификация</string>
+    <string name="manufacturing_date">Дата изготовления</string>
+    <string name="shelf_life">Срок хранения</string>
+    <string name="storage_conditions">Условия хранения</string>
+    <string name="normal">Обычные</string>
+    <string name="unit_of_measurement">Единица измерения</string>
+    <string name="amount_remaining">Количество на остатке</string>
+    <string name="amount_received">Количество получено</string>
+    <string name="minimal_amount">Минимальное количество</string>
+    <string name="consumption_date">Дата расхода</string>
+    <string name="amount">Количество</string>
+    <string name="purpose">Цель</string>
+    <string name="add_lot">Добавить партию</string>
+    <string name="consumption">Расход</string>
+    <string name="responsible">Ответственный</string>
+    <string name="changed">Изменено</string>
+    <string name="consumption_journal">Журнал расхода</string>
+    <string name="shelf_life_expires">Истекает срок</string>
+    <string name="shelf_life_has_expired">Срок истёк</string>
+    <string name="residue">Остаток</string>
 </resources>

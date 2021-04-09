@@ -59,23 +59,13 @@ public class ReceiverSetAlarm extends BroadcastReceiver {
         new Thread(() -> {
             testData.clear();
             if (ChemLabFuel.InventoryList == null) {
+                ChemLabFuel.InventoryList = new ArrayList<>();
                 if (FirebaseAuth.getInstance().getCurrentUser() != null) {
                     if (isNetworkAvailable(context)) {
                         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
                         mDatabase.child("equipments").addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                int size = 0;
-                                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                                    if (postSnapshot.getValue() instanceof HashMap) {
-                                        HashMap hashMap = (HashMap) postSnapshot.getValue();
-                                        if (hashMap.size() > 12) {
-                                            size++;
-                                        }
-                                    }
-                                }
-                                ChemLabFuel.InventoryList = new InventoryList[size];
-                                size = 0;
                                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                                     if (data.getValue() instanceof HashMap) {
                                         HashMap hashMap = (HashMap) data.getValue();
@@ -86,7 +76,7 @@ public class ReceiverSetAlarm extends BroadcastReceiver {
                                                 editedAt = 0L;
                                             if (hashMap.get("editedBy") == null)
                                                 editedBy = "";
-                                            ChemLabFuel.InventoryList[size] = new InventoryList(context,
+                                            ChemLabFuel.InventoryList.add(new InventoryList(
                                                     (String) hashMap.get("createdBy"),
                                                     (long) hashMap.get("data01"),
                                                     (String) hashMap.get("data02"),
@@ -100,8 +90,7 @@ public class ReceiverSetAlarm extends BroadcastReceiver {
                                                     (String) hashMap.get("data10"),
                                                     (long) hashMap.get("data11"),
                                                     (String) hashMap.get("data12"), data.getKey(),
-                                                    (long) editedAt, (String) editedBy);
-                                            size++;
+                                                    (long) editedAt, (String) editedBy));
                                         }
                                     }
                                 }

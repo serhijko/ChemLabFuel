@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".Dialog_reagents_description_edit">
 
     <TextView
-        android:id="@+id/textViewTitle"
+        android:id="@+id/textViewTitleR"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
@@ -22,19 +24,53 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical" >
 
             <TextView
-                android:id="@+id/textView2"
+                android:id="@+id/textView2R"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/equipment_name"
+                android:text="@string/reagent_name"
                 android:textColor="#FF000000"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/editText2e"
+                android:id="@+id/editText2Re"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:textColor="#FF000000"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textView3R"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/date_of_receiving"
+                android:textColor="#FF000000"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textView3Re"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/pick_date"
+                android:paddingBottom="10dp"
+                android:textColor="#FF000000"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/supplier"
+                android:textColor="#FF000000"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/editText5Re"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="text"
@@ -44,13 +80,13 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/mark_type"
+                android:text="@string/complaints"
                 android:textColor="#FF000000"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/editText3e"
+                android:id="@+id/editText6Re"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="text"
@@ -60,13 +96,13 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/serial_number"
+                android:text="@string/qualification"
                 android:textColor="#FF000000"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/editText4e"
+                android:id="@+id/editText7Re"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="text"
@@ -74,109 +110,109 @@
                 android:textSize="18sp" />
 
             <TextView
+                android:id="@+id/textView8R"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/year_of_release_commissioning"
+                android:text="@string/manufacturing_date"
                 android:textColor="#FF000000"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <EditText
-                android:id="@+id/editText5e"
+            <TextView
+                android:id="@+id/textView8Re"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="date"
+                android:hint="@string/pick_date"
+                android:paddingBottom="10dp"
                 android:textColor="#FF000000"
                 android:textSize="18sp" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/calibration_intervals"
+                android:text="@string/shelf_life"
                 android:textColor="#FF000000"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/editText6e"
+                android:id="@+id/editText9Re"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:hint="12"
                 android:inputType="number"
                 android:paddingBottom="10dp"
                 android:textColor="#FF000000"
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/textView7"
+                android:id="@+id/textView10R"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/last_calibration_date"
-                android:textColor="#FF000000"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/textView7e"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/pick_date"
-                android:paddingBottom="10dp"
-                android:textColor="#FF000000"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/textView9"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/conservation_date"
-                android:textColor="#FF000000"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/textView9e"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/pick_date"
-                android:paddingBottom="10dp"
-                android:textColor="#FF000000"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/textView10"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/reactivation_date"
-                android:textColor="#FF000000"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/textView10e"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/pick_date"
-                android:paddingBottom="10dp"
-                android:textColor="#FF000000"
-                android:textSize="18sp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/notes"
+                android:text="@string/storage_conditions"
                 android:textColor="#FF000000"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/editText12e"
+                android:id="@+id/editText10Re"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:imeOptions="actionGo"
+                android:hint="@string/normal"
                 android:inputType="text"
+                android:paddingBottom="10dp"
                 android:textColor="#FF000000"
                 android:textSize="18sp" />
 
+            <TextView
+                android:id="@+id/textView11R"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/unit_of_measurement"
+                android:textColor="#FF000000"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <Spinner
+                android:id="@+id/spinner11Re"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="10dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/amount_received"
+                android:textColor="#FF000000"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/editText12Re"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:textColor="#FF000000"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/minimal_amount"
+                android:textColor="#FF000000"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/editText13Re"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionGo"
+                android:inputType="numberDecimal"
+                android:textColor="#FF000000"
+                android:textSize="18sp" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>
