@@ -16,10 +16,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -114,11 +112,10 @@ public class Dialog_reagents_description_edit extends DialogFragment {
             case 8:
                 if (year == 0)
                     textView8Re.setText("");
+                else if (dayOfMonth == -1)
+                    textView8Re.setText(getString(R.string.set_date2, year, zero1, month + 1));
                 else
-                    if (dayOfMonth == -1)
-                        textView8Re.setText(getString(R.string.set_date2, year, zero1, month + 1));
-                    else
-                        textView8Re.setText(getString(R.string.set_date, year, zero1, month + 1, zero2, dayOfMonth));
+                    textView8Re.setText(getString(R.string.set_date, year, zero1, month + 1, zero2, dayOfMonth));
                 break;
         }
     }
@@ -262,93 +259,88 @@ public class Dialog_reagents_description_edit extends DialogFragment {
         if (editText6Re.getText().toString().trim().equals("")) {
             editText6Re.setText(R.string.no);
         }
+        if (textView8Re.getText().toString().trim().equals("")) {
+            Calendar calendar = Calendar.getInstance();
+            int month = calendar.get(Calendar.MONTH) + 1;
+            String zero = "";
+            if (month < 10) zero = "0";
+            textView8Re.setText(calendar.get(Calendar.YEAR) + "-" + zero + month);
+        }
         if (editText9Re.getText().toString().trim().equals("")) {
             editText9Re.setText("1");
         }
         if (editText10Re.getText().toString().trim().equals("")) {
             editText10Re.setText(R.string.normal);
         }
-        if (!editText12Re.getText().toString().trim().equals("") &&
-                !editText12Re.getText().toString().trim().equals("") &&
-                !textView8Re.getText().toString().trim().equals("")) {
+        if (editText12Re.getText().toString().trim().equals("")) {
+            editText12Re.setText("0");
+        }
+        if (editText13Re.getText().toString().trim().equals("")) {
+            editText13Re.setText("0");
+        }
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+        GregorianCalendar g = (GregorianCalendar) Calendar.getInstance();
 
-            DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-            GregorianCalendar g = (GregorianCalendar) Calendar.getInstance();
-
-            String reagentNumber = String.valueOf(groupPosition);
-            String lotNumber = String.valueOf(childPosition);
-            long text9 = Long.valueOf(editText9Re.getText().toString().trim());
-            if (add && spinner9R.getSelectedItemPosition() == 0) {
-                text9 = text9 * 12;
-            }
-            if (add) {
-                if (ChemLabFuel.ReagentsList.size() != 0) {
-                    for (Map.Entry<Integer, LinkedHashMap<Integer, LinkedHashMap<Integer, String>>> entry1 :
-                            ChemLabFuel.ReagentsList.entrySet()) {
-                        LinkedHashMap<Integer, LinkedHashMap<Integer, String>> value1 = entry1.getValue();
-                        for (Map.Entry<Integer, LinkedHashMap<Integer, String>> entry2 : value1.entrySet()) {
-                            LinkedHashMap<Integer, String> value2 = entry2.getValue();
-                            String name = "no";
-                            for (Map.Entry<Integer, String> entry3 : value2.entrySet()) {
-                                if (entry3.getKey() == 13) {
-                                    name = entry3.getValue();
+        String reagentNumber = String.valueOf(groupPosition);
+        String lotNumber = String.valueOf(childPosition);
+        long text9 = Long.valueOf(editText9Re.getText().toString().trim());
+        if (add && spinner9R.getSelectedItemPosition() == 0) {
+            text9 = text9 * 12;
+        }
+        if (add) {
+            if (ChemLabFuel.ReagentsList.size() != 0) {
+                for (Map.Entry<Integer, LinkedHashMap<Integer, LinkedHashMap<Integer, String>>> entry1 :
+                        ChemLabFuel.ReagentsList.entrySet()) {
+                    LinkedHashMap<Integer, LinkedHashMap<Integer, String>> value1 = entry1.getValue();
+                    for (Map.Entry<Integer, LinkedHashMap<Integer, String>> entry2 : value1.entrySet()) {
+                        LinkedHashMap<Integer, String> value2 = entry2.getValue();
+                        String name = "no";
+                        for (Map.Entry<Integer, String> entry3 : value2.entrySet()) {
+                            if (entry3.getKey() == 13) {
+                                name = entry3.getValue();
+                            }
+                            if (entry3.getKey() == 14) {
+                                if (title.equals("")) {
+                                    groupPosition = Integer.parseInt(entry3.getValue()) + 1;
+                                    reagentNumber = String.valueOf(groupPosition);
+                                } else if (editText2Re.getText().toString().trim().contains(name)) {
+                                    groupPosition = Integer.parseInt(entry3.getValue());
+                                    reagentNumber = String.valueOf(groupPosition);
                                 }
-                                if (entry3.getKey() == 14) {
-                                    if (title.equals("")) {
-                                        groupPosition = Integer.parseInt(entry3.getValue()) + 1;
-                                        reagentNumber = String.valueOf(groupPosition);
-                                    } else if (editText2Re.getText().toString().trim().contains(name)) {
-                                        groupPosition = Integer.parseInt(entry3.getValue());
-                                        reagentNumber = String.valueOf(groupPosition);
-                                    }
-                                }
-                                if (entry3.getKey() == 15) {
-                                    if (editText2Re.getText().toString().trim().contains(name)) {
-                                        childPosition = Integer.parseInt(entry3.getValue()) + 1;
-                                        lotNumber = String.valueOf(childPosition);
-                                    }
+                            }
+                            if (entry3.getKey() == 15) {
+                                if (editText2Re.getText().toString().trim().contains(name)) {
+                                    childPosition = Integer.parseInt(entry3.getValue()) + 1;
+                                    lotNumber = String.valueOf(childPosition);
                                 }
                             }
                         }
-
                     }
+
                 }
-                mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("createdAt").setValue(g.getTimeInMillis());
-                mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("createdBy").setValue(user);
             }
-            mDatabase.child("reagents").child(reagentNumber).child("name").setValue(editText2Re.getText().toString().trim());
-            mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data01").setValue(textView3Re.getText().toString().trim());
-            mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data02").setValue(editText5Re.getText().toString().trim());
-            mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data03").setValue(editText6Re.getText().toString().trim());
-            mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data04").setValue(editText7Re.getText().toString().trim());
-            mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data05").setValue(textView8Re.getText().toString().trim());
-            mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data06").setValue(text9);
-            mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data07").setValue(editText10Re.getText().toString().trim());
-            mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data08").setValue((long) spinner11Re.getSelectedItemPosition());
-            mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data09").setValue(Double.valueOf(editText12Re.getText().toString().trim().replace(".", ",")));
-            mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data10").setValue(Double.valueOf(editText13Re.getText().toString().trim().replace(".", ",")));
-            mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data11").setValue(editText15Re.getText().toString().trim());
-            mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data12").setValue(editText14Re.getText().toString().trim());
-            if (!add) {
-                mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("editedAt").setValue(g.getTimeInMillis());
-                mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("editedBy").setValue(user);
-            }
-            getActivity().sendBroadcast(new Intent(getActivity(), ReceiverSetAlarm.class));
-            listener.UpdateList();
-        } else {
-            LinearLayout layout = new LinearLayout(getActivity());
-            layout.setBackgroundResource(R.color.colorPrimary);
-            TextView toast = new TextView(getActivity());
-            toast.setTextColor(getResources().getColor(R.color.colorIcons));
-            toast.setPadding(10, 10, 10, 10);
-            toast.setText(R.string.error);
-            toast.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-            layout.addView(toast);
-            Toast mes = new Toast(getActivity());
-            mes.setDuration(Toast.LENGTH_LONG);
-            mes.setView(layout);
-            mes.show();
+            mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("createdAt").setValue(g.getTimeInMillis());
+            mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("createdBy").setValue(user);
         }
+        mDatabase.child("reagents").child(reagentNumber).child("name").setValue(editText2Re.getText().toString().trim());
+        mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data01").setValue(textView3Re.getText().toString().trim());
+        mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data02").setValue(editText5Re.getText().toString().trim());
+        mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data03").setValue(editText6Re.getText().toString().trim());
+        mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data04").setValue(editText7Re.getText().toString().trim());
+        mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data05").setValue(textView8Re.getText().toString().trim());
+        mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data06").setValue(text9);
+        mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data07").setValue(editText10Re.getText().toString().trim());
+        mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data08").setValue((long) spinner11Re.getSelectedItemPosition());
+        mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data09").setValue(Double.valueOf(editText12Re.getText().toString().trim().replace(".", ",")));
+        mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data10").setValue(Double.valueOf(editText13Re.getText().toString().trim().replace(".", ",")));
+        mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data11").setValue(editText15Re.getText().toString().trim());
+        mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data12").setValue(editText14Re.getText().toString().trim());
+        if (!add) {
+            mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("editedAt").setValue(g.getTimeInMillis());
+            mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("editedBy").setValue(user);
+        }
+        getActivity().sendBroadcast(new Intent(getActivity(), ReceiverSetAlarm.class));
+        listener.UpdateList();
         getDialog().cancel();
     }
 

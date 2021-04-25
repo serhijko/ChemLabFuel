@@ -252,6 +252,7 @@
                 android:id="@+id/editText12Re"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:hint="0"
                 android:inputType="numberDecimal"
                 android:textColor="#FF000000"
                 android:textSize="18sp" />
@@ -268,6 +269,7 @@
                 android:id="@+id/editText13Re"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:hint="0"
                 android:inputType="numberDecimal"
                 android:textColor="#FF000000"
                 android:textSize="18sp" />

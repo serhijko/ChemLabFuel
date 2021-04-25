@@ -72,10 +72,9 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
     public static LinkedHashMap<Integer, LinkedHashMap<Integer, LinkedHashMap<Integer, String>>>
             ReagentsList = new LinkedHashMap<>();
     private final ArrayList<ReagentsList> listGroup = new ArrayList<>();
-    private final ArrayList<ArrayList<String>> listChild = new ArrayList<>();
     private TabHost tabHost;
     private ExpandableListView listView2;
-    private String[] units = {"кг", "мг", "л", "мл"};
+    private final String[] units = {"кг", "мг", "л", "мл"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -189,10 +188,9 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
     }
 
     private ArrayList<String> search(int groupPosition, int childPosition) {
-        ReagentsList GroupR = listGroup.get(groupPosition);
-        String Group = GroupR.string;
-        int t1 = listChild.get(groupPosition).get(childPosition).indexOf(".");
-        String Child = listChild.get(groupPosition).get(childPosition).substring(0, t1);
+        String Group = listGroup.get(groupPosition).string;
+        int t1 = listGroup.get(groupPosition).arrayList.get(childPosition).indexOf(".");
+        String Child = listGroup.get(groupPosition).arrayList.get(childPosition).substring(0, t1);
         ArrayList<String> arrayList = new ArrayList<>();
         boolean end = false;
         for (Map.Entry<Integer, LinkedHashMap<Integer, LinkedHashMap<Integer, String>>> entry1 :
@@ -497,7 +495,6 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     ReagentsList.clear();
                     listGroup.clear();
-                    listChild.clear();
                     for (DataSnapshot data : dataSnapshot.getChildren()) {
                         String name = (String) data.child("name").getValue();
                         if (name == null)
@@ -506,7 +503,7 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
                         BigDecimal residueSum = BigDecimal.ZERO;
                         BigDecimal minResidue = BigDecimal.ZERO;
                         LinkedHashMap<Integer, LinkedHashMap<Integer, String>> listN = new LinkedHashMap<>();
-                        ArrayList<String> lot = new ArrayList<>();
+                        ArrayList<String> listChild = new ArrayList<>();
                         GregorianCalendar g = (GregorianCalendar) Calendar.getInstance();
                         long today = g.getTimeInMillis();
                         long data05b = 0;
@@ -593,13 +590,13 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
                                     else
                                         minResidue = BigDecimal.valueOf((double) (long) data2.child("data10").getValue());
                                     data08 = (int) (long) data2.child("data08").getValue();
-                                    lot.add(data2.getKey() + "." + term + " <!---->" + getString(R.string.residue) + ": "
+                                    listChild.add(data2.getKey() + "." + term + " <!---->" + getString(R.string.residue) + ": "
                                             + residue.toString().replace(".", ",") + " " + units[data08]);
                                 }
                             }
                         }
-                        listGroup.add(new ReagentsList(data05b, Integer.parseInt(id), name, residueSum, minResidue, data08));
-                        listChild.add(lot);
+                        listGroup.add(new ReagentsList(data05b, Integer.parseInt(id), name, residueSum, minResidue, data08,
+                                listChild));
                         ReagentsList.put(Integer.parseInt(id), listN);
                     }
                     if (getIntent().getExtras() != null) {
@@ -804,7 +801,7 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
 
         @Override
         public int getChildrenCount(int groupPosition) {
-            return listChild.get(groupPosition).size();
+            return listGroup.get(groupPosition).arrayList.size();
         }
 
         @Override
@@ -814,7 +811,7 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
 
         @Override
         public Object getChild(int groupPosition, int childPosition) {
-            return listChild.get(groupPosition).get(childPosition);
+            return listGroup.get(groupPosition).arrayList.get(childPosition);
         }
 
         @Override
@@ -881,7 +878,7 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
             }
             viewHolder.button_popup.setOnClickListener(v -> showPopupMenu(viewHolder.button_popup,
                     groupPosition, childPosition));
-            viewHolder.textView.setText(Html.fromHtml(listChild.get(groupPosition).get(childPosition)));
+            viewHolder.textView.setText(Html.fromHtml(listGroup.get(groupPosition).arrayList.get(childPosition)));
             viewHolder.textView.setTextSize(fuel.getInt("fontSize", 18));
             return convertView;
         }
@@ -927,7 +924,7 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
                     return true;
                 }
                 if (menuItem.getItemId() == R.id.menu_remove) {
-                    String listGroupSt = listChild.get(groupPosition).get(childPosition);
+                    String listGroupSt = listGroup.get(groupPosition).arrayList.get(childPosition);
                     int t1 = listGroupSt.indexOf(" <");
                     if (t1 != -1)
                         listGroupSt = listGroupSt.substring(0, t1);
