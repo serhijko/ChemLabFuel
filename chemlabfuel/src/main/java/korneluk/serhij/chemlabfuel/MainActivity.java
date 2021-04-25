@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        // Check if useremail is signed in (non-null) and update UI accordingly.
+        // Check if userEmail is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         updateUI(currentUser);
     }
@@ -126,6 +126,8 @@ public class MainActivity extends AppCompatActivity {
         if (user != null) {
             Intent intent = new Intent(this, ChemLabFuel.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            if (getIntent().getExtras() != null)
+                intent.putExtra("reagent", getIntent().getExtras().getBoolean("reagent", false));
             startActivity(intent);
             finish();
         }

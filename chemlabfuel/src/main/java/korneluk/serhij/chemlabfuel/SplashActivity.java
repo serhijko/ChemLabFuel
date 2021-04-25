@@ -16,6 +16,8 @@ public class SplashActivity extends AppCompatActivity {
         if (getIntent().getExtras() != null) {
             intent.putExtra("notifications",
                     getIntent().getExtras().getBoolean("notifications", false));
+            intent.putExtra("reagent",
+                    getIntent().getExtras().getBoolean("reagent", false));
         }
         startActivity(intent);
         finish();

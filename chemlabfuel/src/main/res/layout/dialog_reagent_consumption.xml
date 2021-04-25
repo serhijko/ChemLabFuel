@@ -35,25 +35,55 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/textView1Ce"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/pick_date"
-                android:paddingBottom="10dp"
-                android:textColor="#FF000000"
-                android:textSize="18sp" />
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView1Ce"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingBottom="10dp"
+                    android:textColor="#FF000000"
+                    android:textSize="18sp" />
+
+                <Button
+                    android:id="@+id/button1C"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/pick_date" />
+            </LinearLayout>
 
             <TextView
+                android:id="@+id/quantity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/amount"
+                android:text="@string/quantity"
                 android:textColor="#FF000000"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/editText2Ce"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:textColor="#FF000000"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/density"
+                android:textColor="#FF000000"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/editText4Ce"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="numberDecimal"

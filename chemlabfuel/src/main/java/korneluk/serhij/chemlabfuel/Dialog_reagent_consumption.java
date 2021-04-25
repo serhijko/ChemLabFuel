@@ -2,6 +2,8 @@ package korneluk.serhij.chemlabfuel;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -33,13 +35,17 @@ public class Dialog_reagent_consumption extends DialogFragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String GROUP_POSITION = "groupPosition";
     private static final String CHILD_POSITION = "childPosition";
+    private static final String UNIT = "unit";
 
     private int groupPosition = 0;
     private int childPosition = 0;
+    private int unit = 0;
     private TextView textView1Ce;
     private EditText editText2Ce;
     private EditText editText3Ce;
+    private EditText editText4Ce;
     private GregorianCalendar c;
+    private String[] units = {"килограммах", "миллиграммах", "литрах", "миллилитрах"};
 
     /**
      * Use this factory method to create a new instance of
@@ -49,11 +55,12 @@ public class Dialog_reagent_consumption extends DialogFragment {
      * @param childPosition Parameter 2.
      * @return A new instance of fragment Dialog_reagent_consumption.
      */
-    static Dialog_reagent_consumption getInstance(int groupPosition, int childPosition) {
+    static Dialog_reagent_consumption getInstance(int groupPosition, int childPosition, int unit) {
         Dialog_reagent_consumption fragmentDescription = new Dialog_reagent_consumption();
         Bundle args = new Bundle();
         args.putInt(GROUP_POSITION, groupPosition);
         args.putInt(CHILD_POSITION, childPosition);
+        args.putInt(UNIT, unit);
         fragmentDescription.setArguments(args);
         return fragmentDescription;
     }
@@ -64,13 +71,17 @@ public class Dialog_reagent_consumption extends DialogFragment {
         if (getArguments() != null) {
             groupPosition = getArguments().getInt(GROUP_POSITION, 1);
             childPosition = getArguments().getInt(CHILD_POSITION, 1);
+            unit = getArguments().getInt(UNIT, 0);
         }
         View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_reagent_consumption, null);
         TextView textViewTitleC = view.findViewById(R.id.textViewTitleC);
         textView1Ce = view.findViewById(R.id.textView1Ce);
+        TextView amount = view.findViewById(R.id.quantity);
+        amount.setText(amount.getText().toString() + " в " + units[unit]);
         c = (GregorianCalendar) Calendar.getInstance();
         set_date(1, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DATE));
-        textView1Ce.setOnClickListener(v -> {
+        Button button1C = view.findViewById(R.id.button1C);
+        button1C.setOnClickListener(v -> {
             String[] t1 = textView1Ce.getText().toString().split("-");
             c = new GregorianCalendar(Integer.parseInt(t1[0]), Integer.parseInt(t1[1]) - 1, Integer.parseInt(t1[2]));
             TextView textView1C = view.findViewById(R.id.textView1C);
@@ -87,6 +98,8 @@ public class Dialog_reagent_consumption extends DialogFragment {
             return false;
         });
         editText2Ce = view.findViewById(R.id.editText2Ce);
+        editText2Ce.addTextChangedListener(new MyTextWatcher(editText2Ce));
+        editText4Ce = view.findViewById(R.id.editText4Ce);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setPositiveButton(getString(R.string.save), (dialog, which) -> {
             send();
@@ -146,6 +159,35 @@ public class Dialog_reagent_consumption extends DialogFragment {
                 textView1Ce.setText("");
             else
                 textView1Ce.setText(getString(R.string.set_date, year, zero1, month + 1, zero2, dayOfMonth));
+        }
+    }
+
+    private class MyTextWatcher implements TextWatcher {
+
+        private int editPosition;
+        private EditText editText;
+
+        MyTextWatcher(EditText editText) {
+            this.editText = editText;
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            editPosition = start + count;
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            String edit = s.toString();
+            edit = edit.replace(".", ",");
+            editText.removeTextChangedListener(this);
+            editText.setText(edit);
+            editText.setSelection(editPosition);
+            editText.addTextChangedListener(this);
         }
     }
 }

@@ -115,14 +115,28 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/textView7e"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/pick_date"
-                android:paddingBottom="10dp"
-                android:textColor="#FF000000"
-                android:textSize="18sp" />
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView7e"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:hint="@string/no_date"
+                    android:paddingBottom="10dp"
+                    android:textColor="#FF000000"
+                    android:textSize="18sp" />
+
+                <Button
+                    android:id="@+id/button7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@string/pick_date" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/textView9"
@@ -133,14 +147,28 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/textView9e"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/pick_date"
-                android:paddingBottom="10dp"
-                android:textColor="#FF000000"
-                android:textSize="18sp" />
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView9e"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:hint="@string/no_date"
+                    android:paddingBottom="10dp"
+                    android:textColor="#FF000000"
+                    android:textSize="18sp" />
+
+                <Button
+                    android:id="@+id/button9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@string/pick_date" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/textView10"
@@ -151,14 +179,28 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/textView10e"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/pick_date"
-                android:paddingBottom="10dp"
-                android:textColor="#FF000000"
-                android:textSize="18sp" />
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView10e"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:hint="@string/no_date"
+                    android:paddingBottom="10dp"
+                    android:textColor="#FF000000"
+                    android:textSize="18sp" />
+
+                <Button
+                    android:id="@+id/button10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@string/pick_date" />
+            </LinearLayout>
 
             <TextView
                 android:layout_width="match_parent"

@@ -8,6 +8,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.SeekBar;
 import android.widget.Spinner;
@@ -31,14 +32,21 @@ public class SettingsActivity extends AppCompatActivity {
         int fontSize = fuel.getInt("fontSize", 18);
         int notify = fuel.getInt("notification", 0);
         setContentView(R.layout.settings_activity);
-        Spinner spinner = findViewById(R.id.spinner);
+        Spinner spinner = findViewById(R.id.spinner9);
         ArrayAdapter<String> adapter = new ListAdapter(this);
         spinner.setAdapter(adapter);
         spinner.setSelection(notify);
-        spinner.setOnItemClickListener((adapterView, view, position, id) -> {
-            editor.putInt("notification", position);
-            editor.apply();
-            sendBroadcast(new Intent(SettingsActivity.this, ReceiverSetAlarm.class));
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                editor.putInt("notification", position);
+                editor.apply();
+                sendBroadcast(new Intent(SettingsActivity.this, ReceiverSetAlarm.class));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
         });
         SeekBar seekBar = findViewById(R.id.seekBar);
         TextView textSize = findViewById(R.id.textSize);
@@ -58,12 +66,10 @@ public class SettingsActivity extends AppCompatActivity {
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
             }
         });
         setToolbarTheme();

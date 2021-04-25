@@ -17,23 +17,29 @@ public class ReceiverNotification extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        sendNotification(context);
+        sendNotification(context, intent.getBooleanExtra("reagent", false));
     }
 
-    private void sendNotification(Context context) {
+    private void sendNotification(Context context, boolean reagent) {
         Intent notificationIntent = new Intent(context, SplashActivity.class);
         notificationIntent.putExtra("notifications", true);
+        notificationIntent.putExtra("reagent", reagent);
         PendingIntent contentIntent = PendingIntent.getActivity(context,
                 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         Resources res = context.getResources();
         String channelId = "2020";
+        if (reagent)
+            channelId = "2030";
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId);
         builder.setContentIntent(contentIntent)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setLargeIcon(BitmapFactory.decodeResource(res, R.drawable.ic_launcher))
                 .setAutoCancel(true)
-                .setContentTitle("Истекает срок")
-                .setContentText("следующей аттестации, поверки, калибровки");
+                .setContentTitle("Истекает срок");
+        if (reagent)
+            builder.setContentText("годности реактива");
+        else
+            builder.setContentText("следующей аттестации, поверки, калибровки");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             builder.setChannelId("korneluk.serhij.chemlabfuel");
         }

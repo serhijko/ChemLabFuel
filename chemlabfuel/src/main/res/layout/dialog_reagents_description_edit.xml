@@ -52,14 +52,28 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/textView3Re"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/pick_date"
-                android:paddingBottom="10dp"
-                android:textColor="#FF000000"
-                android:textSize="18sp" />
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView3Re"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:hint="@string/no_date"
+                    android:paddingBottom="10dp"
+                    android:textColor="#FF000000"
+                    android:textSize="18sp" />
+
+                <Button
+                    android:id="@+id/button3R"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/pick_date" />
+            </LinearLayout>
 
             <TextView
                 android:layout_width="match_parent"
@@ -89,6 +103,7 @@
                 android:id="@+id/editText6Re"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:hint="@string/no"
                 android:inputType="text"
                 android:textColor="#FF000000"
                 android:textSize="18sp" />
@@ -110,6 +125,23 @@
                 android:textSize="18sp" />
 
             <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/lot"
+                android:textColor="#FF000000"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/editText14Re"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:inputType="text"
+                android:textColor="#FF000000"
+                android:textSize="18sp" />
+
+            <TextView
                 android:id="@+id/textView8R"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -118,14 +150,28 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/textView8Re"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/pick_date"
-                android:paddingBottom="10dp"
-                android:textColor="#FF000000"
-                android:textSize="18sp" />
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView8Re"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:hint="@string/no_date"
+                    android:paddingBottom="10dp"
+                    android:textColor="#FF000000"
+                    android:textSize="18sp" />
+
+                <Button
+                    android:id="@+id/button8R"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/pick_date" />
+            </LinearLayout>
 
             <TextView
                 android:layout_width="match_parent"
@@ -135,18 +181,32 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <EditText
-                android:id="@+id/editText9Re"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="12"
-                android:inputType="number"
-                android:paddingBottom="10dp"
-                android:textColor="#FF000000"
-                android:textSize="18sp" />
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/editText9Re"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:hint="1"
+                    android:inputType="number"
+                    android:paddingBottom="10dp"
+                    android:textColor="#FF000000"
+                    android:textSize="18sp" />
+
+                <Spinner
+                    android:id="@+id/spinner9R"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginBottom="10dp" />
+            </LinearLayout>
 
             <TextView
-                android:id="@+id/textView10R"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/storage_conditions"
@@ -165,7 +225,6 @@
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/textView11R"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/unit_of_measurement"
@@ -184,7 +243,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/amount_received"
+                android:text="@string/quantity_received"
                 android:textColor="#FF000000"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -200,7 +259,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/minimal_amount"
+                android:text="@string/minimal_quantity"
                 android:textColor="#FF000000"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -209,10 +268,27 @@
                 android:id="@+id/editText13Re"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:imeOptions="actionGo"
                 android:inputType="numberDecimal"
                 android:textColor="#FF000000"
                 android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textView15R"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/consumption_journal"
+                android:textColor="#FF000000"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/editText15Re"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:gravity="start|top"
+                android:inputType="textMultiLine"
+                android:minLines="8" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

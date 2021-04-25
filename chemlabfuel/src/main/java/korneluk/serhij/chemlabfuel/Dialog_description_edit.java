@@ -123,7 +123,8 @@ public class Dialog_description_edit extends DialogFragment {
             }
             return false;
         });
-        editText7.setOnClickListener(v -> {
+        Button button7 = view.findViewById(R.id.button7);
+        button7.setOnClickListener(v -> {
             GregorianCalendar c;
             if (editText7.getText().toString().equals("")) {
                 c = (GregorianCalendar) Calendar.getInstance();
@@ -136,7 +137,8 @@ public class Dialog_description_edit extends DialogFragment {
             Dialog_date date = Dialog_date.getInstance(c.getTimeInMillis(), 7, textView7.getText().toString());
             date.show(getFragmentManager(), "date");
         });
-        editText9.setOnClickListener(v -> {
+        Button button9 = view.findViewById(R.id.button9);
+        button9.setOnClickListener(v -> {
             GregorianCalendar c;
             if (editText9.getText().toString().equals("")) {
                 c = (GregorianCalendar) Calendar.getInstance();
@@ -149,7 +151,8 @@ public class Dialog_description_edit extends DialogFragment {
             Dialog_date date = Dialog_date.getInstance(c.getTimeInMillis(), 9, textView9.getText().toString());
             date.show(getFragmentManager(), "date");
         });
-        editText10.setOnClickListener(v -> {
+        Button button10 = view.findViewById(R.id.button10);
+        button10.setOnClickListener(v -> {
             GregorianCalendar c;
             if (editText10.getText().toString().equals("")) {
                 c = (GregorianCalendar) Calendar.getInstance();

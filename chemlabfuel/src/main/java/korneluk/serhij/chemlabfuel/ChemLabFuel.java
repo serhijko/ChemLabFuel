@@ -73,6 +73,9 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
             ReagentsList = new LinkedHashMap<>();
     private final ArrayList<ReagentsList> listGroup = new ArrayList<>();
     private final ArrayList<ArrayList<String>> listChild = new ArrayList<>();
+    private TabHost tabHost;
+    private ExpandableListView listView2;
+    private String[] units = {"кг", "мг", "л", "мл"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,11 +92,11 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
         listView.setOnItemLongClickListener(this);
 
         arrayAdapter2 = new ReagentsListAdapter();
-        ExpandableListView listView2 = findViewById(R.id.listView2);
+        listView2 = findViewById(R.id.listView2);
         listView2.setAdapter(arrayAdapter2);
         listView2.setOnChildClickListener(this);
 
-        TabHost tabHost = findViewById(R.id.tabhost);
+        tabHost = findViewById(R.id.tabhost);
         tabHost.setup();
         TabHost.TabSpec tabSpec;
         tabSpec = tabHost.newTabSpec("tag1");
@@ -188,11 +191,8 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
     private ArrayList<String> search(int groupPosition, int childPosition) {
         ReagentsList GroupR = listGroup.get(groupPosition);
         String Group = GroupR.string;
-        int t1 = listChild.get(groupPosition).get(childPosition).indexOf(": ");
-        String Child = listChild.get(groupPosition).get(childPosition).substring(t1 + 2);
-        int t2 = Child.indexOf(" <");
-        if (t2 != -1)
-            Child = Child.substring(0, t2);
+        int t1 = listChild.get(groupPosition).get(childPosition).indexOf(".");
+        String Child = listChild.get(groupPosition).get(childPosition).substring(0, t1);
         ArrayList<String> arrayList = new ArrayList<>();
         boolean end = false;
         for (Map.Entry<Integer, LinkedHashMap<Integer, LinkedHashMap<Integer, String>>> entry1 :
@@ -202,7 +202,7 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
                 LinkedHashMap<Integer, String> value2 = entry2.getValue();
                 arrayList.clear();
                 for (Map.Entry<Integer, String> entry3 : value2.entrySet()) {
-                    if (entry3.getKey() >= 0 && entry3.getKey() <= 16)
+                    if (entry3.getKey() >= 0 && entry3.getKey() <= 17)
                         arrayList.add(entry3.getValue());
                 }
                 if (Group.contains(arrayList.get(13)) && Child.contains(arrayList.get(15))) {
@@ -260,14 +260,15 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
                 "<strong>" + getString(R.string.supplier) + "</strong><br>" + arrayList.get(2) + "<br><br>" +
                 "<strong>" + getString(R.string.complaints) + "</strong><br>" + arrayList.get(3) + "<br><br>" +
                 "<strong>" + getString(R.string.qualification) + "</strong><br>" + arrayList.get(4) + "<br><br>" +
+                "<strong>" + getString(R.string.lot) + "</strong><br>" + arrayList.get(17) + "<br><br>" +
                 "<strong>" + getString(R.string.manufacturing_date) + "</strong><br>" + arrayList.get(5) + "<br><br>" +
                 "<strong>" + getString(R.string.shelf_life) + "</strong><br>" + arrayList.get(6) + "<br><br>" +
                 "<strong>" + getString(R.string.storage_conditions) + "</strong><br>" + arrayList.get(7) + "<br><br>" +
                 "<strong>" + getString(R.string.unit_of_measurement) + "</strong><br>" + unit[Integer.parseInt(arrayList.get(8))] + "<br><br>" +
-                "<strong>" + getString(R.string.amount_remaining) + "</strong><br>" + arrayList.get(9) + "<br><br>" +
-                "<strong>" + getString(R.string.minimal_amount) + "</strong><br>" + arrayList.get(10) + "<br><br>" +
+                "<strong>" + getString(R.string.quantity_left) + "</strong><br>" + arrayList.get(9).replace(".", ",") + "<br><br>" +
+                "<strong>" + getString(R.string.minimal_quantity) + "</strong><br>" + arrayList.get(10).replace(".", ",") + "<br><br>" +
                 "<strong>" + getString(R.string.responsible) + "</strong><br>" + fnG + " " + lnG + "<br><br>" +
-                "<strong>" + getString(R.string.changed) + "</strong><br>" + editedString +
+                "<strong>" + getString(R.string.changed) + "</strong><br>" + editedString + "<br><br>" +
                 "<strong>" + getString(R.string.consumption_journal) + arrayList.get(16).replace("\n", "<br>");
         Dialog_description description = Dialog_description.getInstance(data02, builder);
         description.show(getSupportFragmentManager(), "description");
@@ -321,7 +322,7 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
             mDatabase.child("equipments").child(InventoryList.get(position).uid).removeValue();
         } else {
             ArrayList<String> arrayList = search(groupPosition, position);
-            if (ReagentsList.get(Integer.parseInt(arrayList.get(17))).size() == 1)
+            if (ReagentsList.get(Integer.parseInt(arrayList.get(18))).size() == 1)
                 mDatabase.child("reagents").child(arrayList.get(14)).removeValue();
             else
                 mDatabase.child("reagents").child(arrayList.get(14)).child(arrayList.get(15)).removeValue();
@@ -376,7 +377,7 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
         }
         if (id == R.id.add_reagent) {
             if (isNetworkAvailable()) {
-                reagentsDescriptionEdit = Dialog_reagents_description_edit.getInstance(userEdit, "", "0");
+                reagentsDescriptionEdit = Dialog_reagents_description_edit.getInstance(userEdit, "", "", 0);
                 reagentsDescriptionEdit.show(getSupportFragmentManager(), "edit");
                 descriptionEdit = null;
                 consumption = null;
@@ -448,6 +449,7 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
             mDatabase.child("equipments").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    InventoryList.clear();
                     for (DataSnapshot data : dataSnapshot.getChildren()) {
                         if (data.getValue() instanceof HashMap) {
                             HashMap hashMap = (HashMap) data.getValue();
@@ -507,7 +509,8 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
                         ArrayList<String> lot = new ArrayList<>();
                         GregorianCalendar g = (GregorianCalendar) Calendar.getInstance();
                         long today = g.getTimeInMillis();
-                        long data06 = 0;
+                        long data05b = 0;
+                        int data08 = 0;
                         for (DataSnapshot data2 : data.getChildren()) {
                             String term = "";
                             int i = 0;
@@ -524,6 +527,9 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
                                     Object data11 = data2.child("data11").getValue();
                                     if (data11 == null)
                                         data11 = "";
+                                    Object data12 = data2.child("data12").getValue();
+                                    if (data12 == null)
+                                        data12 = "";
                                     lists.put(i, (String) data2.child("createdBy").getValue()); // 0
                                     i++;
                                     lists.put(i, (String) data2.child("data01").getValue()); // 1
@@ -557,12 +563,17 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
                                     lists.put(i, data2.getKey()); // 15
                                     i++;
                                     lists.put(i, (String) data11); // 16
+                                    i++;
+                                    lists.put(i, String.valueOf(data12)); // 17
                                     listN.put(Integer.parseInt(data2.getKey()), lists);
 
                                     String data05 = (String) data2.child("data05").getValue();
                                     String[] d = data05.split("-");
-                                    g.set(Integer.parseInt(d[0]), Integer.parseInt(d[1]) - 1, Integer.parseInt(d[2]));
-                                    data06 = g.getTimeInMillis();
+                                    if (d.length == 3)
+                                        g.set(Integer.parseInt(d[0]), Integer.parseInt(d[1]) - 1, Integer.parseInt(d[2]));
+                                    else
+                                        g.set(Integer.parseInt(d[0]), Integer.parseInt(d[1]) - 1, 1);
+                                    data05b = g.getTimeInMillis();
                                     g.add(Calendar.MONTH, (int) (long) data2.child("data06").getValue());
                                     BigDecimal residue;
                                     if (data2.child("data09").getValue() instanceof Double)
@@ -581,19 +592,29 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
                                         minResidue = BigDecimal.valueOf((double) data2.child("data10").getValue());
                                     else
                                         minResidue = BigDecimal.valueOf((double) (long) data2.child("data10").getValue());
-                                    lot.add(getString(R.string.lot) + ": " + data2.getKey() + term);
+                                    data08 = (int) (long) data2.child("data08").getValue();
+                                    lot.add(data2.getKey() + "." + term + " <!---->" + getString(R.string.residue) + ": "
+                                            + residue.toString().replace(".", ",") + " " + units[data08]);
                                 }
                             }
                         }
-                        listGroup.add(new ReagentsList(data06, Integer.parseInt(id), name, residueSum, minResidue));
+                        listGroup.add(new ReagentsList(data05b, Integer.parseInt(id), name, residueSum, minResidue, data08));
                         listChild.add(lot);
                         ReagentsList.put(Integer.parseInt(id), listN);
+                    }
+                    if (getIntent().getExtras() != null) {
+                        if (getIntent().getExtras().getBoolean("reagent", false)) {
+                            tabHost.setCurrentTabByTag("tag2");
+                            for ( int i = 0; i < arrayAdapter2.getGroupCount(); i++ ) {
+                                listView2.expandGroup(i);
+                            }
+                        }
                     }
                     Collections.sort(listGroup, new ReagentsListSort(ChemLabFuel.this));
                     arrayAdapter2.notifyDataSetChanged();
                     progressBar.setVisibility(View.GONE);
 
-                    //sendBroadcast(new Intent(ChemLabFuel.this, ReceiverSetAlarm.class));
+                    sendBroadcast(new Intent(ChemLabFuel.this, ReceiverSetAlarm.class));
                 }
 
                 @Override
@@ -830,11 +851,15 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
             }
             group.textView.setTextSize(fuel.getInt("fontSize", 18));
             String residue = " (" + getString(R.string.residue) + ": " +
-                    listGroup.get(groupPosition).residue + ")";
+                    listGroup.get(groupPosition).residue.toString().replace(".", ",") +
+                    " " + units[listGroup.get(groupPosition).unit] + ")";
             int compare = listGroup.get(groupPosition).residue.compareTo(listGroup.get(groupPosition).minResidue);
-            if (compare <= 0)
+            if (listGroup.get(groupPosition).residue.equals(BigDecimal.ZERO))
+                residue = " <font color=#9A2828" + getString(R.string.shelf_life_has_expired) + "</font>";
+            else if (compare <= 0)
                 residue = " (<font color=#9A2828" + getString(R.string.residue) + ": " +
-                        listGroup.get(groupPosition).residue + "</font>)";
+                        listGroup.get(groupPosition).residue.toString().replace(".", ",") +
+                        " " + units[listGroup.get(groupPosition).unit] + "</font>)";
             group.textView.setText(Html.fromHtml(listGroup.get(groupPosition).id + ". " +
                     listGroup.get(groupPosition).string + residue));
             return convertView;
@@ -876,7 +901,8 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
                 popup.dismiss();
                 if (menuItem.getItemId() == R.id.menu_add) {
                     reagentsDescriptionEdit = Dialog_reagents_description_edit.getInstance(userEdit,
-                            listGroup.get(groupPosition).string, listGroup.get(groupPosition).minResidue.toString());
+                            listGroup.get(groupPosition).string, listGroup.get(groupPosition).minResidue.toString(),
+                            listGroup.get(groupPosition).unit);
                     reagentsDescriptionEdit.show(getSupportFragmentManager(), "edit");
                     descriptionEdit = null;
                     consumption = null;
@@ -885,7 +911,7 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
                 if (menuItem.getItemId() == R.id.menu_consumption) {
                     ArrayList<String> arrayList = search(groupPosition, childPosition);
                     consumption = Dialog_reagent_consumption.getInstance(Integer.parseInt(arrayList.get(14)),
-                            Integer.parseInt(arrayList.get(15)));
+                            Integer.parseInt(arrayList.get(15)), Integer.parseInt(arrayList.get(8)));
                     consumption.show(getSupportFragmentManager(), "consumption");
                     descriptionEdit = null;
                     reagentsDescriptionEdit = null;
