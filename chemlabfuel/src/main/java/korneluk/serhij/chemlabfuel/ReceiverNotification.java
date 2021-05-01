@@ -17,13 +17,13 @@ public class ReceiverNotification extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        sendNotification(context, intent.getBooleanExtra("reagent", false));
+        sendNotification(context, intent.getBooleanExtra("reagents", false));
     }
 
     private void sendNotification(Context context, boolean reagent) {
         Intent notificationIntent = new Intent(context, SplashActivity.class);
         notificationIntent.putExtra("notifications", true);
-        notificationIntent.putExtra("reagent", reagent);
+        notificationIntent.putExtra("reagents", reagent);
         PendingIntent contentIntent = PendingIntent.getActivity(context,
                 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         Resources res = context.getResources();
@@ -48,7 +48,7 @@ public class ReceiverNotification extends BroadcastReceiver {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel("korneluk.serhij.chemlabfuel",
-                    "chemlabfuel", NotificationManager.IMPORTANCE_DEFAULT);
+                    "ChemLabFuel", NotificationManager.IMPORTANCE_DEFAULT);
             notificationManager.createNotificationChannel(channel);
         }
         notificationManager.notify(205, notification);

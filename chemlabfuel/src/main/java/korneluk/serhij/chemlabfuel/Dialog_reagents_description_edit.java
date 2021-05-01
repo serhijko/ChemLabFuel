@@ -41,14 +41,13 @@ public class Dialog_reagents_description_edit extends DialogFragment {
     private EditText editText5Re;
     private EditText editText6Re;
     private EditText editText7Re;
-    private TextView textView8Re;
+    private EditText editText8Re;
     private EditText editText9Re;
     private EditText editText10Re;
     private Spinner spinner11Re;
     private EditText editText12Re;
     private EditText editText13Re;
     private EditText editText14Re;
-    private EditText editText15Re;
     private Spinner spinner9R;
     private String user = "";
     private String title = "";
@@ -111,11 +110,11 @@ public class Dialog_reagents_description_edit extends DialogFragment {
                 break;
             case 8:
                 if (year == 0)
-                    textView8Re.setText("");
-                else if (dayOfMonth == -1)
-                    textView8Re.setText(getString(R.string.set_date2, year, zero1, month + 1));
+                    editText8Re.setText("");
+                //else if (dayOfMonth == -1)
+                    //editText8Re.setText(getString(R.string.set_date2, year, zero1, month + 1));
                 else
-                    textView8Re.setText(getString(R.string.set_date, year, zero1, month + 1, zero2, dayOfMonth));
+                    editText8Re.setText(getString(R.string.set_date, year, zero1, month + 1, zero2, dayOfMonth));
                 break;
         }
     }
@@ -133,7 +132,7 @@ public class Dialog_reagents_description_edit extends DialogFragment {
         editText5Re = view.findViewById(R.id.editText5Re);
         editText6Re = view.findViewById(R.id.editText6Re);
         editText7Re = view.findViewById(R.id.editText7Re);
-        textView8Re = view.findViewById(R.id.textView8Re);
+        editText8Re = view.findViewById(R.id.editText8Re);
         editText9Re = view.findViewById(R.id.editText9Re);
         editText10Re = view.findViewById(R.id.editText10Re);
         spinner11Re = view.findViewById(R.id.spinner11Re);
@@ -154,7 +153,6 @@ public class Dialog_reagents_description_edit extends DialogFragment {
         editText13Re = view.findViewById(R.id.editText13Re);
         editText13Re.addTextChangedListener(new MyTextWatcher(editText13Re));
         editText14Re = view.findViewById(R.id.editText14Re);
-        editText15Re = view.findViewById(R.id.editText15Re);
         Button button3R = view.findViewById(R.id.button3R);
         button3R.setOnClickListener(v -> {
             GregorianCalendar c;
@@ -171,10 +169,10 @@ public class Dialog_reagents_description_edit extends DialogFragment {
         Button button8R = view.findViewById(R.id.button8R);
         button8R.setOnClickListener(v -> {
             GregorianCalendar c;
-            if (textView8Re.getText().toString().equals("")) {
+            if (editText8Re.getText().toString().equals("")) {
                 c = (GregorianCalendar) Calendar.getInstance();
             } else {
-                String[] t1 = textView8Re.getText().toString().split("-");
+                String[] t1 = editText8Re.getText().toString().split("-");
                 if (t1.length == 3)
                     c = new GregorianCalendar(Integer.parseInt(t1[0]), Integer.parseInt(t1[1]) - 1, Integer.parseInt(t1[2]));
                 else
@@ -206,10 +204,9 @@ public class Dialog_reagents_description_edit extends DialogFragment {
                 return false;
             });
             spinner11Re.setSelection(unit);
-            TextView textView15R = view.findViewById(R.id.textView15R);
-            textView15R.setVisibility(View.GONE);
-            editText15Re.setVisibility(View.GONE);
         } else {
+            TextView textView12R = view.findViewById(R.id.textView12R);
+            textView12R.setText(R.string.quantity_left);
             spinner9R.setVisibility(View.GONE);
             textViewTitleR.setText(ChemLabFuel.ReagentsList.get(groupPosition).get(childPosition).get(13));
             editText2Re.setText(ChemLabFuel.ReagentsList.get(groupPosition).get(childPosition).get(13));
@@ -217,14 +214,13 @@ public class Dialog_reagents_description_edit extends DialogFragment {
             editText5Re.setText(ChemLabFuel.ReagentsList.get(groupPosition).get(childPosition).get(2));
             editText6Re.setText(ChemLabFuel.ReagentsList.get(groupPosition).get(childPosition).get(3));
             editText7Re.setText(ChemLabFuel.ReagentsList.get(groupPosition).get(childPosition).get(4));
-            textView8Re.setText(ChemLabFuel.ReagentsList.get(groupPosition).get(childPosition).get(5));
+            editText8Re.setText(ChemLabFuel.ReagentsList.get(groupPosition).get(childPosition).get(5));
             editText9Re.setText(String.valueOf(ChemLabFuel.ReagentsList.get(groupPosition).get(childPosition).get(6)));
             editText10Re.setText(ChemLabFuel.ReagentsList.get(groupPosition).get(childPosition).get(7));
             spinner11Re.setSelection(Integer.parseInt(ChemLabFuel.ReagentsList.get(groupPosition).get(childPosition).get(8)));
             editText12Re.setText(String.valueOf(ChemLabFuel.ReagentsList.get(groupPosition).get(childPosition).get(9)));
             editText13Re.setText(String.valueOf(ChemLabFuel.ReagentsList.get(groupPosition).get(childPosition).get(10)));
             editText14Re.setText(String.valueOf(ChemLabFuel.ReagentsList.get(groupPosition).get(childPosition).get(17)));
-            editText15Re.setText(String.valueOf(ChemLabFuel.ReagentsList.get(groupPosition).get(childPosition).get(16)));
         }
 
         editText2Re.setSelection(editText2Re.getText().length());
@@ -259,12 +255,12 @@ public class Dialog_reagents_description_edit extends DialogFragment {
         if (editText6Re.getText().toString().trim().equals("")) {
             editText6Re.setText(R.string.no);
         }
-        if (textView8Re.getText().toString().trim().equals("")) {
+        if (editText8Re.getText().toString().trim().equals("")) {
             Calendar calendar = Calendar.getInstance();
             int month = calendar.get(Calendar.MONTH) + 1;
             String zero = "";
             if (month < 10) zero = "0";
-            textView8Re.setText(calendar.get(Calendar.YEAR) + "-" + zero + month);
+            editText8Re.setText(calendar.get(Calendar.YEAR) + "-" + zero + month);
         }
         if (editText9Re.getText().toString().trim().equals("")) {
             editText9Re.setText("1");
@@ -327,13 +323,12 @@ public class Dialog_reagents_description_edit extends DialogFragment {
         mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data02").setValue(editText5Re.getText().toString().trim());
         mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data03").setValue(editText6Re.getText().toString().trim());
         mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data04").setValue(editText7Re.getText().toString().trim());
-        mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data05").setValue(textView8Re.getText().toString().trim());
+        mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data05").setValue(editText8Re.getText().toString().trim());
         mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data06").setValue(text9);
         mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data07").setValue(editText10Re.getText().toString().trim());
         mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data08").setValue((long) spinner11Re.getSelectedItemPosition());
         mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data09").setValue(Double.valueOf(editText12Re.getText().toString().trim().replace(".", ",")));
         mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data10").setValue(Double.valueOf(editText13Re.getText().toString().trim().replace(".", ",")));
-        mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data11").setValue(editText15Re.getText().toString().trim());
         mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data12").setValue(editText14Re.getText().toString().trim());
         if (!add) {
             mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("editedAt").setValue(g.getTimeInMillis());

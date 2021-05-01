@@ -56,15 +56,17 @@ import java.util.Map;
 public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItemClickListener,
         AdapterView.OnItemLongClickListener, Dialog_context_menu.Dialog_context_menu_Listener,
         Dialog_delete_confirm.Dialog_delete_confirm_listener, Dialog_date.Dialog_date_listener,
-        Dialog_reagents_description_edit.listUpdaterListener, ExpandableListView.OnChildClickListener {
+        Dialog_reagents_description_edit.listUpdaterListener, ExpandableListView.OnChildClickListener,
+        Dialog_reagent_consumption.updateJournal, ReagentsContextMenuDialog.ReagentsContextMenuDialogListener {
 
     private final ArrayList<String> inventory_list = new ArrayList<>();
     private ArrayAdapter<String> arrayAdapter;
     private ReagentsListAdapter arrayAdapter2;
-    private final ArrayList<ArrayList<String>> users = new ArrayList<>();
+    public static ArrayList<ArrayList<String>> users = new ArrayList<>();
     private Dialog_description_edit descriptionEdit;
     private Dialog_reagents_description_edit reagentsDescriptionEdit;
     private Dialog_reagent_consumption consumption;
+    private JournalDialog journal;
     private String userEdit;
     private ProgressBar progressBar;
     private FirebaseAuth mAuth;
@@ -77,10 +79,68 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
     private final String[] units = {"кг", "мг", "л", "мл"};
 
     @Override
+    public void onAddLotDialog(int groupPosition) {
+        reagentsDescriptionEdit = Dialog_reagents_description_edit.getInstance(userEdit,
+                listGroup.get(groupPosition).string,
+                listGroup.get(groupPosition).minResidue.toString(),
+                listGroup.get(groupPosition).unit);
+        reagentsDescriptionEdit.show(getSupportFragmentManager(), "edit");
+        descriptionEdit = null;
+        consumption = null;
+        journal = null;
+    }
+
+    @Override
+    public void onConsumptionDialog(int groupPosition, int childPosition) {
+        ArrayList<String> arrayList = search(groupPosition, childPosition);
+        consumption = Dialog_reagent_consumption.getInstance(Integer.parseInt(arrayList.get(14)),
+                Integer.parseInt(arrayList.get(15)), Integer.parseInt(arrayList.get(8)), userEdit);
+        consumption.show(getSupportFragmentManager(), "consumption");
+        descriptionEdit = null;
+        reagentsDescriptionEdit = null;
+        journal = null;
+    }
+
+    @Override
+    public void onJournalDialog(int groupPosition, int childPosition) {
+        ArrayList<String> arrayList = search(groupPosition, childPosition);
+        journal = JournalDialog.getInstance(Integer.parseInt(arrayList.get(14)),
+                Integer.parseInt(arrayList.get(15)), Integer.parseInt(arrayList.get(8)),
+                arrayList.get(16), userEdit);
+        journal.show(getSupportFragmentManager(), "journal");
+        descriptionEdit = null;
+        reagentsDescriptionEdit = null;
+        consumption = null;
+    }
+
+    @Override
+    public void onEditDialog(int groupPosition, int childPosition) {
+        ArrayList<String> arrayList = search(groupPosition, childPosition);
+        reagentsDescriptionEdit = Dialog_reagents_description_edit.getInstance(userEdit,
+                Integer.parseInt(arrayList.get(14)), Integer.parseInt(arrayList.get(15)));
+        reagentsDescriptionEdit.show(getSupportFragmentManager(), "edit");
+        descriptionEdit = null;
+        consumption = null;
+        journal = null;
+    }
+
+    @Override
+    public void onRemoveDialog(int groupPosition, int childPosition) {
+        String listGroupSt = listGroup.get(groupPosition).arrayList.get(childPosition);
+        int t1 = listGroupSt.indexOf(" <");
+        if (t1 != -1)
+            listGroupSt = listGroupSt.substring(0, t1);
+        Dialog_delete_confirm confirm = Dialog_delete_confirm.getInstance(
+                listGroup.get(groupPosition).string + " " + listGroupSt,
+                groupPosition, childPosition);
+        confirm.show(getSupportFragmentManager(), "confirm");
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chemlabfuel);
-        SharedPreferences fuel = getSharedPreferences("fuel", Context.MODE_PRIVATE);
+        SharedPreferences chemLab = getSharedPreferences("ChemLabFuel", Context.MODE_PRIVATE);
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
         progressBar = findViewById(R.id.loading);
@@ -94,6 +154,22 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
         listView2 = findViewById(R.id.listView2);
         listView2.setAdapter(arrayAdapter2);
         listView2.setOnChildClickListener(this);
+        listView2.setOnItemLongClickListener((parent, view, position, id) -> {
+            long packedPosition = listView2.getExpandableListPosition(position);
+            int itemType = ExpandableListView.getPackedPositionType(packedPosition);
+            int groupPosition = ExpandableListView.getPackedPositionGroup(packedPosition);
+            int childPosition = ExpandableListView.getPackedPositionChild(packedPosition);
+            if (itemType == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+                ArrayList<String> arrayList = search(groupPosition, childPosition);
+                ReagentsContextMenuDialog dialog = ReagentsContextMenuDialog.getInstance(
+                        groupPosition, childPosition,
+                        ChemLabFuel.ReagentsList.get(Integer.parseInt(arrayList.get(14)))
+                                .get(Integer.parseInt(arrayList.get(15))).get(13));
+                dialog.show(getSupportFragmentManager(), "reagents");
+                return true;
+            }
+            return false;
+        });
 
         tabHost = findViewById(R.id.tabhost);
         tabHost.setup();
@@ -108,12 +184,12 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
         tabSpec.setContent(R.id.tab2);
         tabHost.addTab(tabSpec);
         tabHost.setOnTabChangedListener(tabId -> {
-            SharedPreferences.Editor editor = fuel.edit();
+            SharedPreferences.Editor editor = chemLab.edit();
             editor.putBoolean("equipments", tabId.contains("tag1"));
             editor.apply();
             supportInvalidateOptionsMenu();
         });
-        if (fuel.getBoolean("equipments", true)) {
+        if (chemLab.getBoolean("equipments", true)) {
             tabHost.setCurrentTabByTag("tag1");
         } else {
             tabHost.setCurrentTabByTag("tag2");
@@ -266,8 +342,7 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
                 "<strong>" + getString(R.string.quantity_left) + "</strong><br>" + arrayList.get(9).replace(".", ",") + "<br><br>" +
                 "<strong>" + getString(R.string.minimal_quantity) + "</strong><br>" + arrayList.get(10).replace(".", ",") + "<br><br>" +
                 "<strong>" + getString(R.string.responsible) + "</strong><br>" + fnG + " " + lnG + "<br><br>" +
-                "<strong>" + getString(R.string.changed) + "</strong><br>" + editedString + "<br><br>" +
-                "<strong>" + getString(R.string.consumption_journal) + arrayList.get(16).replace("\n", "<br>");
+                "<strong>" + getString(R.string.changed) + "</strong><br>" + editedString;
         Dialog_description description = Dialog_description.getInstance(data02, builder);
         description.show(getSupportFragmentManager(), "description");
         return false;
@@ -283,6 +358,12 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
     @Override
     public void UpdateList() {
         arrayAdapter2.notifyDataSetChanged();
+    }
+
+    @Override
+    public void updateConsumptionJournal(int position, String t0, String t1, String t2, String t3, String t4, String t5) {
+        if (journal != null)
+            journal.updateConsumptionJournal(position, t0, t1, t2, t3, t4, t5);
     }
 
     @Override
@@ -350,12 +431,12 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
         super.onPrepareOptionsMenu(menu);
         FirebaseUser currentUser = mAuth.getCurrentUser();
         menu.findItem(R.id.exit).setVisible(currentUser != null);
-        SharedPreferences fuel = getSharedPreferences("fuel", Context.MODE_PRIVATE);
-        int sort = fuel.getInt("sort", 0);
+        SharedPreferences chemLab = getSharedPreferences("ChemLabFuel", Context.MODE_PRIVATE);
+        int sort = chemLab.getInt("sort", 0);
         menu.findItem(R.id.sortAlpha).setChecked(sort == 1);
         menu.findItem(R.id.sortTime).setChecked(sort == 2);
-        menu.findItem(R.id.add).setVisible(fuel.getBoolean("equipments", true));
-        menu.findItem(R.id.add_reagent).setVisible(!fuel.getBoolean("equipments", true));
+        menu.findItem(R.id.add).setVisible(chemLab.getBoolean("equipments", true));
+        menu.findItem(R.id.add_reagent).setVisible(!chemLab.getBoolean("equipments", true));
         return true;
     }
 
@@ -390,8 +471,8 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
             finish();
         }
         if (id == R.id.sortAlpha) {
-            SharedPreferences fuel = getSharedPreferences("fuel", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = fuel.edit();
+            SharedPreferences chemLab = getSharedPreferences("ChemLabFuel", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = chemLab.edit();
             if (item.isChecked()) {
                 editor.putInt("sort", 0);
                 editor.apply();
@@ -412,8 +493,8 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
             supportInvalidateOptionsMenu();
         }
         if (id == R.id.sortTime) {
-            SharedPreferences fuel = getSharedPreferences("fuel", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = fuel.edit();
+            SharedPreferences chemLab = getSharedPreferences("ChemLabFuel", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = chemLab.edit();
             if (item.isChecked()) {
                 editor.putInt("sort", 0);
                 editor.apply();
@@ -495,6 +576,7 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     ReagentsList.clear();
                     listGroup.clear();
+                    Gson gson = new Gson();
                     for (DataSnapshot data : dataSnapshot.getChildren()) {
                         String name = (String) data.child("name").getValue();
                         if (name == null)
@@ -523,7 +605,7 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
                                         editedBy = "";
                                     Object data11 = data2.child("data11").getValue();
                                     if (data11 == null)
-                                        data11 = "";
+                                        data11 = new ArrayList<>();
                                     Object data12 = data2.child("data12").getValue();
                                     if (data12 == null)
                                         data12 = "";
@@ -559,7 +641,7 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
                                     i++;
                                     lists.put(i, data2.getKey()); // 15
                                     i++;
-                                    lists.put(i, (String) data11); // 16
+                                    lists.put(i, gson.toJson(data11)); // 16
                                     i++;
                                     lists.put(i, String.valueOf(data12)); // 17
                                     listN.put(Integer.parseInt(data2.getKey()), lists);
@@ -600,9 +682,9 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
                         ReagentsList.put(Integer.parseInt(id), listN);
                     }
                     if (getIntent().getExtras() != null) {
-                        if (getIntent().getExtras().getBoolean("reagent", false)) {
+                        if (getIntent().getExtras().getBoolean("reagents", false)) {
                             tabHost.setCurrentTabByTag("tag2");
-                            for ( int i = 0; i < arrayAdapter2.getGroupCount(); i++ ) {
+                            for (int i = 0; i < arrayAdapter2.getGroupCount(); i++) {
                                 listView2.expandGroup(i);
                             }
                         }
@@ -640,8 +722,8 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
                         }
                     }
                     Gson gson = new Gson();
-                    SharedPreferences fuel = getSharedPreferences("fuel", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = fuel.edit();
+                    SharedPreferences chemLab = getSharedPreferences("ChemLabFuel", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = chemLab.edit();
                     editor.putString("users", gson.toJson(users));
                     editor.apply();
                 }
@@ -651,8 +733,8 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
                 }
             });
         } else {
-            SharedPreferences fuel = getSharedPreferences("fuel", Context.MODE_PRIVATE);
-            String g = fuel.getString("fuel_data", "");
+            SharedPreferences chemLab = getSharedPreferences("ChemLabFuel", Context.MODE_PRIVATE);
+            String g = chemLab.getString("lab_data", "");
             if (!g.equals("")) {
                 Gson gson = new Gson();
                 Type type = new TypeToken<InventoryList[]>() {}.getType();
@@ -660,7 +742,7 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
                 for (InventoryList inventoryList : InventoryList) {
                     inventory_list.add(inventoryList.data01 + ". " + inventoryList.data02);
                 }
-                String us = fuel.getString("users", "");
+                String us = chemLab.getString("users", "");
                 Type type2 = new TypeToken<ArrayList<ArrayList<String>>>() {}.getType();
                 users.addAll(gson.fromJson(us, type2));
                 arrayAdapter.notifyDataSetChanged();
@@ -689,11 +771,11 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
 
     private class ListAdapter extends ArrayAdapter<String> {
 
-        private final SharedPreferences fuel;
+        private final SharedPreferences chemLab;
 
         ListAdapter() {
             super(ChemLabFuel.this, R.layout.simple_list_item, inventory_list);
-            fuel = getSharedPreferences("fuel", Context.MODE_PRIVATE);
+            chemLab = getSharedPreferences("ChemLabFuel", Context.MODE_PRIVATE);
         }
 
         @NonNull
@@ -755,7 +837,7 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
                 }
             }
             viewHolder.textView.setText(Html.fromHtml(inventory_list.get(position) + dataLong));
-            viewHolder.textView.setTextSize(fuel.getInt("fontSize", 18));
+            viewHolder.textView.setTextSize(chemLab.getInt("fontSize", 18));
             return mView;
         }
 
@@ -788,10 +870,10 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
 
     private class ReagentsListAdapter extends BaseExpandableListAdapter {
 
-        private final SharedPreferences fuel;
+        private final SharedPreferences chemLab;
 
         ReagentsListAdapter() {
-            fuel = getSharedPreferences("fuel", Context.MODE_PRIVATE);
+            chemLab = getSharedPreferences("ChemLabFuel", Context.MODE_PRIVATE);
         }
 
         @Override
@@ -846,7 +928,7 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
             } else {
                 group = (ViewHolderGroup) convertView.getTag();
             }
-            group.textView.setTextSize(fuel.getInt("fontSize", 18));
+            group.textView.setTextSize(chemLab.getInt("fontSize", 18));
             String residue = " (" + getString(R.string.residue) + ": " +
                     listGroup.get(groupPosition).residue.toString().replace(".", ",") +
                     " " + units[listGroup.get(groupPosition).unit] + ")";
@@ -879,7 +961,7 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
             viewHolder.button_popup.setOnClickListener(v -> showPopupMenu(viewHolder.button_popup,
                     groupPosition, childPosition));
             viewHolder.textView.setText(Html.fromHtml(listGroup.get(groupPosition).arrayList.get(childPosition)));
-            viewHolder.textView.setTextSize(fuel.getInt("fontSize", 18));
+            viewHolder.textView.setTextSize(chemLab.getInt("fontSize", 18));
             return convertView;
         }
 
@@ -903,24 +985,39 @@ public class ChemLabFuel extends AppCompatActivity implements AdapterView.OnItem
                     reagentsDescriptionEdit.show(getSupportFragmentManager(), "edit");
                     descriptionEdit = null;
                     consumption = null;
+                    journal = null;
                     return true;
                 }
                 if (menuItem.getItemId() == R.id.menu_consumption) {
                     ArrayList<String> arrayList = search(groupPosition, childPosition);
-                    consumption = Dialog_reagent_consumption.getInstance(Integer.parseInt(arrayList.get(14)),
-                            Integer.parseInt(arrayList.get(15)), Integer.parseInt(arrayList.get(8)));
+                    consumption = Dialog_reagent_consumption.getInstance(
+                            Integer.parseInt(arrayList.get(14)), Integer.parseInt(arrayList.get(15)),
+                            Integer.parseInt(arrayList.get(8)), userEdit);
                     consumption.show(getSupportFragmentManager(), "consumption");
                     descriptionEdit = null;
                     reagentsDescriptionEdit = null;
+                    journal = null;
                     return true;
                 }
-                if (menuItem.getItemId() == R.id.menu_consumption) {
+                if (menuItem.getItemId() == R.id.menu_journal) {
+                    ArrayList<String> arrayList = search(groupPosition, childPosition);
+                    journal = JournalDialog.getInstance(Integer.parseInt(arrayList.get(14)),
+                            Integer.parseInt(arrayList.get(15)),
+                            Integer.parseInt(arrayList.get(8)), arrayList.get(16), userEdit);
+                    journal.show(getSupportFragmentManager(), "journal");
+                    descriptionEdit = null;
+                    reagentsDescriptionEdit = null;
+                    consumption = null;
+                    return true;
+                }
+                if (menuItem.getItemId() == R.id.menu_editor) {
                     ArrayList<String> arrayList = search(groupPosition, childPosition);
                     reagentsDescriptionEdit = Dialog_reagents_description_edit.getInstance(userEdit,
                             Integer.parseInt(arrayList.get(14)), Integer.parseInt(arrayList.get(15)));
                     reagentsDescriptionEdit.show(getSupportFragmentManager(), "edit");
                     descriptionEdit = null;
                     consumption = null;
+                    journal = null;
                     return true;
                 }
                 if (menuItem.getItemId() == R.id.menu_remove) {

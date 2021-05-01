@@ -214,9 +214,7 @@ public class Dialog_description_edit extends DialogFragment {
         //imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
         builder.setView(view);
 
-        builder.setPositiveButton(getString(R.string.save), (dialogInterface, which) -> {
-            send();
-        });
+        builder.setPositiveButton(getString(R.string.save), (dialogInterface, which) -> send());
         builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.cancel());
         AlertDialog alert = builder.create();
         alert.setOnShowListener(dialogInterface -> {

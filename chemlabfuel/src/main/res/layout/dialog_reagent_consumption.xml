@@ -43,7 +43,7 @@
 
                 <TextView
                     android:id="@+id/textView1Ce"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:paddingBottom="10dp"
@@ -86,6 +86,7 @@
                 android:id="@+id/editText4Ce"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:hint="1"
                 android:inputType="numberDecimal"
                 android:textColor="#FF000000"
                 android:textSize="18sp" />

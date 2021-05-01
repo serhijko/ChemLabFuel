@@ -59,7 +59,7 @@
 
                 <TextView
                     android:id="@+id/textView3Re"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
@@ -155,13 +155,14 @@
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/textView8Re"
-                    android:layout_width="wrap_content"
+                <EditText
+                    android:id="@+id/editText8Re"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
                     android:hint="@string/no_date"
+                    android:inputType="date"
                     android:paddingBottom="10dp"
                     android:textColor="#FF000000"
                     android:textSize="18sp" />
@@ -188,7 +189,7 @@
 
                 <EditText
                     android:id="@+id/editText9Re"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:hint="1"
@@ -241,6 +242,7 @@
                 android:layout_marginBottom="10dp" />
 
             <TextView
+                android:id="@+id/textView12R"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/quantity_received"
@@ -274,23 +276,6 @@
                 android:textColor="#FF000000"
                 android:textSize="18sp" />
 
-            <TextView
-                android:id="@+id/textView15R"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/consumption_journal"
-                android:textColor="#FF000000"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/editText15Re"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:gravity="start|top"
-                android:inputType="textMultiLine"
-                android:minLines="8" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

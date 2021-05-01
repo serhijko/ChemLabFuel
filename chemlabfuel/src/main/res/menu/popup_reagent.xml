@@ -10,6 +10,10 @@
         android:title="@string/consumption" />
 
     <item
+        android:id="@+id/menu_journal"
+        android:title="@string/consumption_journal" />
+
+    <item
         android:id="@+id/menu_editor"
         android:title="@string/edit" />
 

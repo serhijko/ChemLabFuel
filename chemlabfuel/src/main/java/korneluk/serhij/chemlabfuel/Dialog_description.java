@@ -22,6 +22,7 @@ public class Dialog_description extends DialogFragment {
         Bundle bundle = new Bundle();
         bundle.putString("title", title);
         bundle.putString("string", string);
+        //bundle.putString("journal", journal);
         description.setArguments(bundle);
         return description;
     }
@@ -47,7 +48,51 @@ public class Dialog_description extends DialogFragment {
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         textView.setTextColor(getResources().getColor(R.color.colorPrimary_text));
         linearLayout.addView(scrollView);
-        scrollView.addView(textView);
+        LinearLayout linearLayout1 = new LinearLayout(getActivity());
+        linearLayout1.setOrientation(LinearLayout.VERTICAL);
+        linearLayout1.addView(textView);
+        /*String journal = getArguments().getString("journal", "");
+        if (!journal.equals("")) {
+            Gson gson = new Gson();
+            Type type = new TypeToken<ArrayList<ArrayList<String>>>() {}.getType();
+            ArrayList<ArrayList<String>> journal1 = gson.fromJson(journal, type);
+            for (int i = 0; i < journal1.size(); i++) {
+                String createBy = journal1.get(i).get(5);
+                String fnG = "";
+                String lnG = "";
+                for (int i2 = 0; i2 < ChemLabFuel.users.size(); i2++) {
+                    if (ChemLabFuel.users.get(i2).get(0).contains(createBy)) {
+                        fnG = ChemLabFuel.users.get(i2).get(1);
+                        lnG = ChemLabFuel.users.get(i2).get(2);
+                        break;
+                    }
+                }
+                TextView textView1 = new TextView(getActivity());
+                textView1.setPadding(10, 10, 10, 10);
+                textView1.setText(journal1.get(i).get(0) + " " + journal1.get(i).get(1) + " " +
+                        journal1.get(i).get(2) + " " + journal1.get(i).get(3) + " " +
+                        journal1.get(i).get(4) + " " + fnG + " " + lnG);
+                textView1.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+                textView1.setTextColor(getResources().getColor(R.color.colorPrimary_text));
+                textView1.setOnClickListener(v -> {
+                    TextView textView2 = (TextView) v;
+                    LinearLayout layout = new LinearLayout(getActivity());
+                    layout.setBackgroundResource(R.color.colorPrimary);
+                    TextView toast = new TextView(getActivity());
+                    toast.setTextColor(getResources().getColor(R.color.colorIcons));
+                    toast.setPadding(10, 10, 10, 10);
+                    toast.setText(textView2.getText());
+                    toast.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+                    layout.addView(toast);
+                    Toast mes = new Toast(getActivity());
+                    mes.setDuration(Toast.LENGTH_LONG);
+                    mes.setView(layout);
+                    mes.show();
+                });
+                linearLayout1.addView(textView1);
+            }
+        }*/
+        scrollView.addView(linearLayout1);
         builder.setPositiveButton(getString(R.string.good), (dialog, which) -> dialog.cancel());
         builder.setView(linearLayout);
         AlertDialog alert = builder.create();

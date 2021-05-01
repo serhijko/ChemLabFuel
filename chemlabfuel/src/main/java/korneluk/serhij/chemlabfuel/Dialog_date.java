@@ -108,17 +108,17 @@ public class Dialog_date extends DialogFragment {
             });
             builder.setPositiveButton("Отмена", (dialogInterface, i) -> dialogInterface.cancel());
         }
-        if (textView == 3 || textView == 1) {
+        if (textView == 3 || textView == 1 || textView == 8) {
             builder.setPositiveButton("Отмена", (dialogInterface, i) -> dialogInterface.cancel());
         }
-        if (textView == 8) {
+        /*if (textView == 8) {
             builder.setNegativeButton("Отмена", (dialogInterface, i) -> dialogInterface.cancel());
             builder.setPositiveButton("Установить месяц", (dialogInterface, i) -> {
                 GregorianCalendar c = new GregorianCalendar();
                 c.setTimeInMillis(calendarView.getDate());
                 listener.set_date(textView, c.get(Calendar.YEAR), c.get(Calendar.MONTH), -1);
             });
-        }
+        }*/
         AlertDialog alertDialog = builder.create();
         alertDialog.setOnShowListener(dialogInterface -> {
             Button btnPositive = alertDialog.getButton(Dialog.BUTTON_POSITIVE);

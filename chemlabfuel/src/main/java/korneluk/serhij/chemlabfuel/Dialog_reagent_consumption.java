@@ -1,6 +1,8 @@
 package korneluk.serhij.chemlabfuel;
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -20,8 +22,12 @@ import androidx.fragment.app.DialogFragment;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -36,6 +42,9 @@ public class Dialog_reagent_consumption extends DialogFragment {
     private static final String GROUP_POSITION = "groupPosition";
     private static final String CHILD_POSITION = "childPosition";
     private static final String UNIT = "unit";
+    private static final String USER = "user";
+    private static final String JOURNAL = "journal";
+    private static final String POSITION = "position";
 
     private int groupPosition = 0;
     private int childPosition = 0;
@@ -45,7 +54,13 @@ public class Dialog_reagent_consumption extends DialogFragment {
     private EditText editText3Ce;
     private EditText editText4Ce;
     private GregorianCalendar c;
+    private String user = "";
     private String[] units = {"килограммах", "миллиграммах", "литрах", "миллилитрах"};
+    private String[] units2 = {"килограмм(а)", "миллиграмм(а)", "литр(а)", "миллилитр(а)"};
+    private String journal = "";
+    private int position;
+    private ArrayList<ArrayList<String>> journals;
+    private updateJournal listener;
 
     /**
      * Use this factory method to create a new instance of
@@ -55,14 +70,47 @@ public class Dialog_reagent_consumption extends DialogFragment {
      * @param childPosition Parameter 2.
      * @return A new instance of fragment Dialog_reagent_consumption.
      */
-    static Dialog_reagent_consumption getInstance(int groupPosition, int childPosition, int unit) {
+    static Dialog_reagent_consumption getInstance(int groupPosition, int childPosition, int unit,
+                                                  String user) {
         Dialog_reagent_consumption fragmentDescription = new Dialog_reagent_consumption();
         Bundle args = new Bundle();
         args.putInt(GROUP_POSITION, groupPosition);
         args.putInt(CHILD_POSITION, childPosition);
         args.putInt(UNIT, unit);
+        args.putString(USER, user);
         fragmentDescription.setArguments(args);
         return fragmentDescription;
+    }
+
+    static Dialog_reagent_consumption getInstance(int groupPosition, int childPosition, int unit,
+                                                  String user, String journal, int position) {
+        Dialog_reagent_consumption fragmentDescription = new Dialog_reagent_consumption();
+        Bundle args = new Bundle();
+        args.putInt(GROUP_POSITION, groupPosition);
+        args.putInt(CHILD_POSITION, childPosition);
+        args.putInt(UNIT, unit);
+        args.putString(USER, user);
+        args.putString(JOURNAL, journal);
+        args.putInt(POSITION, position);
+        fragmentDescription.setArguments(args);
+        return fragmentDescription;
+    }
+
+    interface updateJournal {
+        void updateConsumptionJournal(int position, String t0, String t1, String t2, String t3,
+                                      String t4, String t5);
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof Activity) {
+            try {
+                listener = (updateJournal) context;
+            } catch (ClassCastException e) {
+                throw new ClassCastException(context.toString() + " must implement updateJournal");
+            }
+        }
     }
 
     @NonNull
@@ -72,6 +120,9 @@ public class Dialog_reagent_consumption extends DialogFragment {
             groupPosition = getArguments().getInt(GROUP_POSITION, 1);
             childPosition = getArguments().getInt(CHILD_POSITION, 1);
             unit = getArguments().getInt(UNIT, 0);
+            user = getArguments().getString(USER, "");
+            journal = getArguments().getString(JOURNAL, "");
+            position = getArguments().getInt(POSITION, 0);
         }
         View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_reagent_consumption, null);
         TextView textViewTitleC = view.findViewById(R.id.textViewTitleC);
@@ -100,10 +151,20 @@ public class Dialog_reagent_consumption extends DialogFragment {
         editText2Ce = view.findViewById(R.id.editText2Ce);
         editText2Ce.addTextChangedListener(new MyTextWatcher(editText2Ce));
         editText4Ce = view.findViewById(R.id.editText4Ce);
+        Gson gson = new Gson();
+        Type type = new TypeToken<ArrayList<ArrayList<String>>>() {}.getType();
+        if (!journal.equals("")) {
+            journals = gson.fromJson(journal, type);
+            textView1Ce.setText(journals.get(position).get(0));
+            editText2Ce.setText(journals.get(position).get(1));
+            editText4Ce.setText(journals.get(position).get(3));
+            editText3Ce.setText(journals.get(position).get(4));
+        } else {
+            journals = gson.fromJson(ChemLabFuel.ReagentsList.get(groupPosition).get(childPosition).get(16),
+                    type);
+        }
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setPositiveButton(getString(R.string.save), (dialog, which) -> {
-            send();
-        });
+        builder.setPositiveButton(getString(R.string.save), (dialog, which) -> send());
         builder.setNegativeButton(getString(R.string.cancel), (dialog, which) -> dialog.cancel());
         builder.setView(view);
         AlertDialog alert = builder.create();
@@ -117,21 +178,60 @@ public class Dialog_reagent_consumption extends DialogFragment {
     }
 
     private void send() {
-        if (!editText2Ce.getText().toString().trim().equals("") && !editText3Ce.getText().toString().equals("")) {
-            String journal = ChemLabFuel.ReagentsList.get(groupPosition).get(childPosition).get(16);
-            if (!journal.equals(""))
-                journal += "\n";
-            journal += textView1Ce.getText().toString() + " " +
-                    new BigDecimal(editText2Ce.getText().toString().trim() + " " +
-                            editText3Ce.getText().toString() + "\n");
+        //String density = "";
+        //if (!editText4Ce.getText().toString().equals("")) {
+        //    density = " Плотность:" + editText4Ce.getText().toString();
+        //}
+        if (!editText2Ce.getText().toString().trim().equals("") && !editText3Ce.getText().toString()
+                .equals("")) {
+            //Gson gson = new Gson();
+            //Type type = new TypeToken<ArrayList<ArrayList<String>>>() {}.getType();
+            //ArrayList<ArrayList<String>> journal = gson.fromJson(ChemLabFuel.ReagentsList
+            //        .get(groupPosition).get(childPosition).get(16), type);
+            //String journal = ChemLabFuel.ReagentsList.get(groupPosition).get(childPosition).get(16);
+            //if (!journal.equals(""))
+            //    journal += "\n";
+            //journal += textView1Ce.getText().toString() + " " +
+            //        new BigDecimal(editText2Ce.getText().toString().trim().replace(",", "."))
+            //                .toString().replace(".", ",") + units[unit] + density +
+            //        " " + editText3Ce.getText().toString() + "\n";
+            if (editText4Ce.getText().toString().trim().equals(""))
+                editText4Ce.setText("1");
+            BigDecimal correct;
+            if (journal.equals("")) {
+                correct = new BigDecimal(ChemLabFuel.ReagentsList.get(groupPosition).get(childPosition).get(9));
+                ArrayList<String> subJournal = new ArrayList<>();
+                subJournal.add(textView1Ce.getText().toString());
+                subJournal.add(new BigDecimal(editText2Ce.getText().toString().trim().replace(",", "."))
+                        .toString().replace(".", ","));
+                subJournal.add(units2[unit]);
+                subJournal.add(new BigDecimal(editText2Ce.getText().toString().trim().replace(",", "."))
+                        .toString().replace(".", ","));
+                subJournal.add(editText3Ce.getText().toString());
+                subJournal.add(user);
+                journals.add(subJournal);
+            } else {
+                correct = new BigDecimal(ChemLabFuel.ReagentsList.get(groupPosition).get(childPosition).get(9))
+                        .add(new BigDecimal(journals.get(position).get(1)));
+                journals.get(position).set(0, textView1Ce.getText().toString());
+                journals.get(position).set(1, new BigDecimal(editText2Ce.getText().toString().trim()
+                        .replace(",", ".")).toString().replace(".", ","));
+                journals.get(position).set(2, units[unit]);
+                journals.get(position).set(3, new BigDecimal(editText4Ce.getText().toString().trim().replace(",", ".")).toString().replace(".", ","));
+                journals.get(position).set(4, editText3Ce.getText().toString());
+                journals.get(position).set(5, user);
+            }
             String reagentNumber = String.valueOf(groupPosition);
             String lotNumber = String.valueOf(childPosition);
             BigDecimal con = new BigDecimal(editText2Ce.getText().toString().trim());
-            BigDecimal consumption =
-                    new BigDecimal(ChemLabFuel.ReagentsList.get(groupPosition).get(childPosition).get(9)).subtract(con);
+            BigDecimal consumption = correct.subtract(con);
             DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
             mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data09").setValue(consumption.doubleValue());
-            mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data11").setValue(journal);
+            mDatabase.child("reagents").child(reagentNumber).child(lotNumber).child("data11").setValue(journals);
+            listener.updateConsumptionJournal(position,
+                    journals.get(position).get(0), journals.get(position).get(1),
+                    journals.get(position).get(2), journals.get(position).get(3),
+                    journals.get(position).get(4), journals.get(position).get(5));
         } else {
             LinearLayout layout = new LinearLayout(getActivity());
             layout.setBackgroundResource(R.color.colorPrimary);

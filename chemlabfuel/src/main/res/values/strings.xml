@@ -66,4 +66,6 @@
     <string name="density">Плотность</string>
     <string name="consumption_journal">Журнал расхода</string>
     <string name="no_date">Нет даты</string>
+    <string name="for_purpose">На цель</string>
+    <string name="entry_made">Запись внес</string><!--The entry was made by-->
 </resources>
